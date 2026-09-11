@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="네온 코어 디펜스 - 방어탑 22종, 증강 아수라장 모드가 있는 2D 타워 디펜스">
+<meta name="description" content="네온 코어 디펜스 - 방어탑 22종, 증강 300종 아수라장 모드가 있는 2D 타워 디펜스">
 </head>
 <body>
 <title>네온 코어 디펜스</title>
@@ -115,7 +115,7 @@ canvas#game{display:block;width:100%;height:auto;touch-action:none;cursor:crossh
 .tab:hover{color:var(--ice);border-color:var(--edge2)}
 .tab.on{background:rgba(47,224,255,.16);border-color:var(--core);color:var(--core)}
 #shop{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-#auglist{display:flex;flex-wrap:wrap;gap:5px}
+#auglist{display:flex;flex-wrap:wrap;gap:5px;max-height:156px;overflow:auto;scrollbar-width:thin}
 .augchip{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;
   border:1px solid;white-space:nowrap}
 .augchip i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;font-style:normal}
@@ -137,6 +137,10 @@ canvas#game{display:block;width:100%;height:auto;touch-action:none;cursor:crossh
 .augcard.r3:hover{box-shadow:0 14px 40px -10px #ff6bd6}
 .augcard .an,.augcard .ad{color:var(--ice)}
 .augcard .ad{color:var(--mute)}
+.augcard .ahead{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.augcard .at{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.08);color:var(--mute);letter-spacing:.02em}
+.augcard .ai{display:block;height:28px}
+.augcard .aw{font-size:10.5px;color:var(--flux);opacity:.9}
 @media (max-width:700px){ .augs{grid-template-columns:1fr} }
 .card{position:relative;padding:8px 8px 7px;border-radius:11px;border:1px solid var(--edge);text-align:left;
   background:rgba(255,255,255,.025);cursor:pointer;color:var(--ice);display:flex;flex-direction:column;gap:5px;
@@ -356,7 +360,7 @@ const ENEMIES={
  brute   :{name:'중장갑', hp:140, spd:34,  armor:8,  gold:15, r:16, col:'#ff9a3c', shape:'hex',    leak:2, pt:26, cls:'giant'},
  flyer   :{name:'비행체', hp:48,  spd:74,  armor:2,  gold:11, r:12, col:'#ff7bd5', shape:'wing',   leak:1, pt:20, air:true},
  splitter:{name:'분열체', hp:84,  spd:46,  armor:2,  gold:12, r:14, col:'#c08bff', shape:'orb',    leak:1, pt:22, split:['shard',2]},
- shard   :{name:'파편',   hp:22,  spd:92,  armor:0,  gold:2,  r:7,  col:'#dcb8ff', shape:'orb',    leak:1, pt:5, noCount:true, cls:'swarm'},
+ shard   :{name:'파편',   hp:22,  spd:92,  armor:0,  gold:2,  r:7,  col:'#dcb8ff', shape:'orb',    leak:1, pt:5, noCount:true, cls:'swarm', vsKey:'splitter'},
  healer  :{name:'재생체', hp:76,  spd:44,  armor:3,  gold:18, r:13, col:'#6effc4', shape:'plus',   leak:1, pt:30, heal:{amt:16,rad:112,cd:1.2}},
  shield  :{name:'차폐체', hp:62,  spd:48,  armor:2,  gold:14, r:13, col:'#ffe066', shape:'oct',    leak:1, pt:24, cls:'giant', shield:{amt:78,regen:22,delay:3.2}},
  phase   :{name:'위상체', hp:70,  spd:68,  armor:0,  gold:13, r:12, col:'#b9c6ff', shape:'star',   leak:1, pt:24, dr:0.35, noSlow:true},
@@ -567,81 +571,338 @@ const chaosSpd=w=>1+Math.min(.55,w*0.011);
 const chaosCount=w=>1+Math.min(1.4,w*0.028);
 
 /* ═══════════ 증강 ═══════════ */
-const AUG={list:[],taken:{},
- dmg:0,rate:0,rng:0,crit:0,critMul:0,
- goldKill:0,goldWave:0,interest:0,
- slow:0,burn:0,stun:0,splash:0,chain:0,exec:0,
- shred:0,vuln:0,swarm:0,giant:0,air:0,
- first:0,last:0,buildDisc:0,upDisc:0,sellBack:0,regen:0,bossGold:0};
+const CAT_OF={};
+for(let i=0;i<TCATS.length;i++) for(let j=0;j<TCATS[i].ids.length;j++) CAT_OF[TCATS[i].ids[j]]=TCATS[i].id;
+const CAT_N={direct:'직사',blast:'폭발',elem:'원소',sup:'지원'};
+const VS_N={drone:'드론',swift:'질주체',brute:'중장갑',flyer:'비행체',splitter:'분열체·파편',healer:'재생체',shield:'차폐체',phase:'위상체'};
+const AUG_NUM=['dmg','rate','rng','crit','critMul','sPow','shred','vuln','enemyHp','enemySpd',
+ 'swarm','giant','air','bossDmg','goldKill','goldWave','interest','buildDisc','upDisc','sellBack',
+ 'bossGold','killLuck','passive','callBonus','freeBuild','regen','leakBlock','coreShield','killHeal',
+ 'last','prepBonus','slow','burn','stun','splash','chain','freeze','knock','shredHit',
+ 'first','fullHp','lowHp','near','far','bossWave','exec','corpse','rush','multi'];
+const AUG_MAP=['cDmg','cRate','cRng','tDmg','tRate','tRng','vs'];
+const AUG={list:[],taken:{}};
 function augReset(){
  AUG.list=[]; AUG.taken={};
- const keep=['list','taken'];
- for(const k in AUG) if(keep.indexOf(k)<0) AUG[k]=0;
+ for(let i=0;i<AUG_NUM.length;i++) AUG[AUG_NUM[i]]=0;
+ for(let i=0;i<AUG_MAP.length;i++) AUG[AUG_MAP[i]]={};
 }
+augReset();
 const RARITY=[null,{n:'일반',c:'#b9c6ff'},{n:'희귀',c:'#ffc247'},{n:'전설',c:'#ff6bd6'}];
-const AUGMENTS=[
- /* 일반 */
- {id:'pw1', r:1,s:1,n:'출력 과부하',d:'모든 방어탑 피해 +18%',f:function(){AUG.dmg+=.18;}},
- {id:'cool',r:1,s:1,n:'냉각 개선',  d:'모든 방어탑 연사 +16%',f:function(){AUG.rate+=.16;}},
- {id:'opt', r:1,s:1,n:'광학 조준',  d:'모든 방어탑 사거리 +14%',f:function(){AUG.rng+=.14;}},
- {id:'prec',r:1,s:1,n:'정밀 회로',  d:'모든 방어탑 치명타 확률 +8%',f:function(){AUG.crit+=.08;}},
- {id:'sal', r:1,s:1,n:'회수 프로토콜',d:'처치 에너지 +20%',f:function(){AUG.goldKill+=.20;}},
- {id:'sup', r:1,s:1,n:'보급 계약',  d:'웨이브 종료 보너스 +35%',f:function(){AUG.goldWave+=.35;}},
- {id:'edge',r:1,s:1,n:'절삭 날',    d:'모든 적의 방어력 -4',f:function(){AUG.shred+=4;}},
- {id:'frst',r:1,s:0,n:'서리 코팅',  d:'모든 공격이 15% 감속을 1.2초 부여',f:function(){AUG.slow=Math.max(AUG.slow,.15);}},
- {id:'ign', r:1,s:0,n:'발화 코팅',  d:'모든 공격이 초당 7의 화상을 3초 부여',f:function(){AUG.burn+=7;}},
- {id:'lite',r:1,s:0,n:'경량 설계',  d:'방어탑 건설 비용 -12%',f:function(){AUG.buildDisc+=.12;}},
- {id:'recy',r:1,s:0,n:'재활용 규격',d:'해체 시 투자 에너지 100% 환급',f:function(){AUG.sellBack=.3;}},
- {id:'emrg',r:1,s:1,n:'비상 전력',  d:'즉시 에너지 +250',f:function(){G.gold+=250;G.earned+=250;}},
- /* 희귀 */
- {id:'dual',r:2,s:1,n:'이중 장전',  d:'피해 +30%, 연사 +12%',f:function(){AUG.dmg+=.30;AUG.rate+=.12;}},
- {id:'exec',r:2,s:0,n:'처형 규약',  d:'체력 8% 이하인 적을 즉시 파괴 (파괴자 제외)',f:function(){AUG.exec=Math.max(AUG.exec,.08);}},
- {id:'aa',  r:2,s:1,n:'대공 교리',  d:'공중 적에게 주는 피해 +60%',f:function(){AUG.air+=.60;}},
- {id:'ap',  r:2,s:1,n:'파쇄 교리',  d:'중장갑·차폐체·파괴자에게 피해 +55%',f:function(){AUG.giant+=.55;}},
- {id:'clr', r:2,s:1,n:'청소 교리',  d:'드론·질주체·파편에게 피해 +80%',f:function(){AUG.swarm+=.80;}},
- {id:'mark',r:2,s:1,n:'취약 표식',  d:'모든 적이 받는 피해 +18%',f:function(){AUG.vuln+=.18;}},
- {id:'chn', r:2,s:0,n:'연쇄 회로',  d:'모든 공격이 18% 확률로 인접 적에게 연쇄',f:function(){AUG.chain+=.18;}},
- {id:'frag',r:2,s:0,n:'충격 신관',  d:'모든 공격에 소형 폭발이 추가된다',f:function(){AUG.splash=Math.max(AUG.splash,46);}},
- {id:'shk', r:2,s:0,n:'전격 마비',  d:'모든 공격이 12% 확률로 0.4초 기절',f:function(){AUG.stun+=.12;}},
- {id:'bank',r:2,s:1,n:'복리 계좌',  d:'웨이브 종료 시 보유 에너지의 6%를 이자로 지급',f:function(){AUG.interest+=.06;}},
- {id:'alp', r:2,s:1,n:'선제 타격',  d:'웨이브 시작 4초 동안 피해 2배',f:function(){AUG.first+=1.0;}},
- {id:'nano',r:2,s:1,n:'나노 정비',  d:'웨이브마다 코어 내구도 +1',f:function(){AUG.regen+=1;}},
- /* 전설 */
- {id:'sing',r:3,s:1,n:'특이점 코어',d:'피해 +55%, 사거리 +20%',f:function(){AUG.dmg+=.55;AUG.rng+=.20;}},
- {id:'tclp',r:3,s:1,n:'시간 붕괴',  d:'모든 방어탑 연사 +45%',f:function(){AUG.rate+=.45;}},
- {id:'doom',r:3,s:1,n:'파멸의 낙인',d:'적 방어력 -12, 받는 피해 +30%',f:function(){AUG.shred+=12;AUG.vuln+=.30;}},
- {id:'div', r:3,s:1,n:'배당금',    d:'처치 에너지 +65%, 웨이브 보너스 +80%',f:function(){AUG.goldKill+=.65;AUG.goldWave+=.80;}},
- {id:'bulw',r:3,s:0,n:'최후의 방벽',d:'최대 내구도 +8, 내구도 5 이하일 때 피해 +120%',
-  f:function(){AUG.last+=1.2;G.maxLives+=8;G.lives+=8;}},
- {id:'retr',r:3,s:0,n:'완전 개조',  d:'보유한 모든 방어탑을 즉시 1단계 무료 강화',
-  f:function(){for(let i=0;i<G.towers.length;i++){const t=G.towers[i];if(t.lv<3){t.lv++;ring(t.x,t.y,tstat(t).rng,t.D.col,.6,2);}}refreshBuffs();}},
- {id:'storm',r:3,s:1,n:'폭풍의 눈', d:'치명타 확률 +22%, 치명타 피해 +80%',f:function(){AUG.crit+=.22;AUG.critMul+=.8;}},
- {id:'inf', r:3,s:1,n:'무한 탄창',  d:'피해 +25%, 연사 +25%, 사거리 +12%',f:function(){AUG.dmg+=.25;AUG.rate+=.25;AUG.rng+=.12;}}
-];
-function augPool(){
- const out=[];
- for(let i=0;i<AUGMENTS.length;i++){
-  const a=AUGMENTS[i];
-  if(AUG.taken[a.id]&&!a.s) continue;
-  out.push(a);
+
+/* 증강 명세 [이름, '효과=값,...'] — 설명문은 효과에서 자동 생성되므로 수치와 항상 일치한다 */
+const AUG_SPEC={
+1:[
+ /* 전용 22 */
+ ['펄스 가속기','tRate.pulse=.25'],['넓은 약실','tDmg.scatter=.25'],['고폭 탄두','tDmg.missile=.25'],
+ ['가속 코일','tRate.rail=.22'],['렌즈 연마','tDmg.beam=.25'],['굴절 결정','tRng.prism=.15'],
+ ['장약 증량','tDmg.mortar=.25'],['고온 코어','tDmg.plasma=.25'],['신속 매설','tRate.mine=.25'],
+ ['재장전 훈련','tRate.nuke=.2'],['냉매 순환','tRng.cryo=.15'],['연료 압축','tDmg.flame=.25'],
+ ['독샘 배양','tDmg.venom=.3'],['전도 코팅','tDmg.arc=.25'],['공명판','tRate.sonic=.22'],
+ ['질량 증폭','tDmg.gravity=.3'],['공진 튜닝','tDmg.amp=.2'],['태엽 보정','tDmg.chrono=.2'],
+ ['안테나 확장','tRng.radar=.2'],['저주 각인','tDmg.curse=.2'],['광맥 탐사','tDmg.mint=.25'],
+ ['예비 부품','tDmg.mender=.25'],
+ /* 계열 8 */
+ ['직사 교범','cDmg.direct=.12'],['탄도 계산기','cRng.direct=.08'],['폭약 표준화','cDmg.blast=.12'],
+ ['신속 장전','cRate.blast=.1'],['원소 촉매','cDmg.elem=.12'],['원소 확산','cRng.elem=.08'],
+ ['지원 네트워크','sPow=.12'],['보조 전원','cRng.sup=.1'],
+ /* 특효 9 */
+ ['드론 사냥꾼','vs.drone=.25'],['반응 사격','vs.swift=.25'],['장갑 관통탄','vs.brute=.2'],
+ ['대공 조준경','vs.flyer=.25'],['분쇄 규약','vs.splitter=.25'],['치유 차단','vs.healer=.3'],
+ ['차폐 파괴자','vs.shield=.3'],['위상 고정','vs.phase=.3'],['거인 사냥','bossDmg=.15'],
+ /* 화력 12 */
+ ['출력 과부하','dmg=.1'],['냉각 개선','rate=.09'],['광학 조준','rng=.07'],['정밀 회로','crit=.06'],
+ ['약점 분석','critMul=.3'],['균형 튜닝','dmg=.06,rate=.05'],['안정화 회로','dmg=.05,rng=.05'],
+ ['경량 포신','rate=.06,rng=.04'],['관측 보조','crit=.04,critMul=.2'],['절삭 날','shred=3'],
+ ['약화 신호','vuln=.07'],['구조 약화','enemyHp=.04'],
+ /* 경제 12 */
+ ['회수 프로토콜','goldKill=.12'],['보급 계약','goldWave=.25'],['소액 적금','interest=.03'],
+ ['경량 설계','buildDisc=.08'],['표준 부품','upDisc=.08'],['중고 거래','sellBack=.1'],
+ ['비상 전력','gold=150'],['행운 칩','killLuck=.08'],['현상금','bossGold=.5'],
+ ['미세 발전기','passive=1.2'],['조기 경보','callBonus=.5'],['가계부','goldKill=.06,goldWave=.12'],
+ /* 생존 8 */
+ ['보강 장갑','maxLives=3'],['자가 수복','regen=.5'],['회피 필드','leakBlock=.08'],
+ ['보호막 발생기','coreShield=1'],['감속 장','enemySpd=.04'],['생명 흡수 회로','killHeal=.008'],
+ ['벼랑 끝','last=.3'],['작전 회의','prepBonus=4'],
+ /* 상태이상 10 */
+ ['서리 코팅','slow=.08'],['발화 코팅','burn=4'],['정전기 탄','stun=.04'],['파편탄','splash=30'],
+ ['연쇄 스파크','chain=.08'],['순간 냉동','freeze=.02'],['충격 탄두','knock=.05'],
+ ['부식 탄','shredHit=.5'],['열교차','burn=3,slow=.05'],['분산 에너지','chain=.05,splash=22'],
+ /* 조건부 8 */
+ ['선제 사격','first=.35'],['첫 타격','fullHp=.25'],['마무리','lowHp=.25'],['근접 방어','near=.2'],
+ ['원거리 저격','far=.2'],['보스전 대비','bossWave=.2'],['처형 규약 초안','exec=.03'],['대공 초소','air=.15'],
+ /* 처치 6 */
+ ['잔해 폭발','corpse=.15'],['승전 고취','rush=.08'],['전리품','killLuck=.05,goldKill=.05'],
+ ['청소 담당','swarm=.2'],['파쇄 담당','giant=.15'],['연쇄 반응','corpse=.1,chain=.03'],
+ /* 특수 5 */
+ ['과열 발사','multi=.04'],['유리 대포','dmg=.2,maxLives=-2'],['탐욕','goldKill=.25,enemyHp=-.05'],
+ ['시제품 지원','freeBuild=1'],['연사 우선','rate=.12,dmg=-.04']
+],
+2:[
+ /* 전용 22 */
+ ['펄스 오버드라이브','tDmg.pulse=.3,tRate.pulse=.25'],['초크 개조','tDmg.scatter=.35,tRng.scatter=.12'],
+ ['다연장 모듈','tDmg.missile=.3,tRate.missile=.25'],['열화 우라늄 탄','tDmg.rail=.4'],
+ ['고출력 발진기','tDmg.beam=.45'],['다중 굴절','tDmg.prism=.35,tRate.prism=.2'],
+ ['포병 사단','tDmg.mortar=.3,tRate.mortar=.2'],['융합 반응로','tDmg.plasma=.35,tRng.plasma=.12'],
+ ['성형 작약','tDmg.mine=.45'],['농축 탄두','tDmg.nuke=.4'],
+ ['극저온 코어','tDmg.cryo=.5,tRng.cryo=.15'],['장거리 노즐','tDmg.flame=.35,tRng.flame=.15'],
+ ['신경독','tDmg.venom=.45'],['초전도체','tDmg.arc=.3,tRate.arc=.2'],
+ ['초음파 집속','tDmg.sonic=.35,tRng.sonic=.12'],['중력자 가속','tDmg.gravity=.4,tRate.gravity=.2'],
+ ['공명 증폭 회로','tDmg.amp=.35,tRng.amp=.12'],['시간 압축','tDmg.chrono=.35,tRng.chrono=.12'],
+ ['위상 배열','tDmg.radar=.35,tRng.radar=.15'],['원념 증폭','tDmg.curse=.35,tRng.curse=.15'],
+ ['심층 채굴','tDmg.mint=.5'],['나노 수리 벌레','tDmg.mender=.5'],
+ /* 계열 8 */
+ ['직사 사단','cDmg.direct=.22'],['고속 포대','cRate.direct=.15,cRng.direct=.08'],
+ ['폭파 전문가','cDmg.blast=.22'],['장거리 포격','cRng.blast=.12,cDmg.blast=.1'],
+ ['원소 지배','cDmg.elem=.22'],['원소 순환','cRate.elem=.15,cRng.elem=.06'],
+ ['지휘 체계','sPow=.22'],['중계기 설치','sPow=.12,cRng.sup=.12'],
+ /* 특효 9 */
+ ['드론 소각','vs.drone=.5'],['질주 저지','vs.swift=.5'],['중장갑 해체','vs.brute=.4'],
+ ['제공권 장악','vs.flyer=.5'],['분열 억제','vs.splitter=.5'],['의무병 우선 사살','vs.healer=.6'],
+ ['보호막 과부하','vs.shield=.6'],['위상 동조','vs.phase=.6'],['파괴자 사냥꾼','bossDmg=.3'],
+ /* 화력 12 */
+ ['이중 장전','dmg=.2,rate=.08'],['가속 회로','rate=.18'],['장거리 광학','rng=.12'],['정밀 조준','crit=.12'],
+ ['급소 타격','critMul=.6'],['전면 개량','dmg=.12,rate=.1'],['표적 획득 체계','dmg=.12,rng=.08'],
+ ['기동 포대','rate=.12,rng=.08'],['저격 교리','crit=.08,critMul=.4'],['장갑 분쇄','shred=6'],
+ ['취약 표식','vuln=.14'],['구조 붕괴','enemyHp=.08'],
+ /* 경제 12 */
+ ['전리품 회수','goldKill=.25'],['전쟁 채권','goldWave=.5'],['복리 계좌','interest=.05'],
+ ['대량 생산','buildDisc=.15'],['개량 특허','upDisc=.15'],['재활용 규격','sellBack=.3'],
+ ['긴급 보급','gold=120,goldW=15'],['황금 칩','killLuck=.15'],['거액 현상금','bossGold=1'],
+ ['소형 발전소','passive=3'],['선제 동원','callBonus=1.2'],['재정 개혁','goldKill=.12,goldWave=.25,interest=.02'],
+ /* 생존 8 */
+ ['강화 외벽','maxLives=6'],['나노 정비','regen=1'],['위상 회피','leakBlock=.15'],
+ ['이중 보호막','coreShield=2'],['중력 저항장','enemySpd=.08'],['생체 흡수','killHeal=.012'],
+ ['배수진','last=.7'],['전략 회의','prepBonus=8'],
+ /* 상태이상 10 */
+ ['액체 질소탄','slow=.15'],['소이탄','burn=8'],['전자기 충격','stun=.08'],['충격 신관','splash=44'],
+ ['연쇄 회로','chain=.15'],['냉동 탄두','freeze=.05'],['반동 탄','knock=.1'],['산성 부식','shredHit=1'],
+ ['플라즈마 코팅','burn=6,stun=.04'],['전기 서리','chain=.1,slow=.08'],
+ /* 조건부 8 */
+ ['기습 작전','first=.8'],['저격 개시','fullHp=.5'],['확인 사살','lowHp=.5'],['최후 방어선','near=.4'],
+ ['장거리 교전','far=.4'],['결전 태세','bossWave=.4'],['처형 규약','exec=.06'],['대공 교리','air=.5'],
+ /* 처치 6 */
+ ['연쇄 폭발','corpse=.25'],['전투 흥분','rush=.16'],['약탈','killLuck=.1,goldKill=.1'],
+ ['청소 교리','swarm=.5'],['파쇄 교리','giant=.4'],['연쇄 붕괴 회로','corpse=.15,chain=.06'],
+ /* 특수 5 */
+ ['연속 사격','multi=.08'],['강화 유리 대포','dmg=.45,maxLives=-4'],['탐욕의 대가','goldKill=.5,enemyHp=-.08'],
+ ['군수 지원','freeBuild=2'],['탄막 전개','rate=.28,dmg=-.06']
+],
+3:[
+ /* 전용 22 */
+ ['펄스 폭풍','tDmg.pulse=.6,tRate.pulse=.5'],['용의 숨결','tDmg.scatter=.7,tRng.scatter=.25'],
+ ['하늘을 가르는 비','tDmg.missile=.6,tRate.missile=.4,tRng.missile=.15'],['반물질 탄환','tDmg.rail=.9'],
+ ['태양 창','tDmg.beam=1'],['무지개 참격','tDmg.prism=.7,tRng.prism=.25'],
+ ['포격 지옥','tDmg.mortar=.6,tRate.mortar=.4'],['항성 붕괴','tDmg.plasma=.8,tRng.plasma=.2'],
+ ['지뢰밭','tDmg.mine=.8,tRate.mine=.4'],['종말 시계','tDmg.nuke=.7,tRate.nuke=.4'],
+ ['빙하기','tDmg.cryo=1,tRng.cryo=.3'],['연옥','tDmg.flame=.8,tRng.flame=.3'],
+ ['역병','tDmg.venom=1'],['뇌신','tDmg.arc=.6,tRate.arc=.4'],
+ ['파멸의 나팔','tDmg.sonic=.7,tRate.sonic=.4'],['사건의 지평선','tDmg.gravity=.8,tRng.gravity=.25'],
+ ['공명 폭주','tDmg.amp=.7,tRng.amp=.25'],['시간 역행','tDmg.chrono=.7,tRng.chrono=.25'],
+ ['전지적 시야','tDmg.radar=.7,tRng.radar=.3'],['멸망의 인장','tDmg.curse=.7,tRng.curse=.3'],
+ ['황금 광산','tDmg.mint=1.2'],['불멸 공정','tDmg.mender=1.2'],
+ /* 계열 8 */
+ ['직사 군단','cDmg.direct=.45'],['포화 교리','cRate.direct=.3,cRng.direct=.15'],
+ ['폭풍의 포대','cDmg.blast=.45'],['융단 폭격','cRate.blast=.3,cRng.blast=.15'],
+ ['원소 폭주','cDmg.elem=.45'],['원소 순환로','cRate.elem=.3,cRng.elem=.12'],
+ ['총사령부','sPow=.5'],['전장 네트워크','sPow=.25,cRng.sup=.25'],
+ /* 특효 9 */
+ ['군집 소멸','vs.drone=1'],['광속 요격','vs.swift=1'],['요새 파괴자','vs.brute=.8'],
+ ['천공 지배','vs.flyer=1'],['분열 소거','vs.splitter=1'],['생명 차단','vs.healer=1.2'],
+ ['방패 분쇄','vs.shield=1.2'],['차원 고정','vs.phase=1.2'],['신살자','bossDmg=.6'],
+ /* 화력 12 */
+ ['특이점 코어','dmg=.55,rng=.2'],['시간 붕괴','rate=.45'],['위성 조준','rng=.3,dmg=.15'],
+ ['폭풍의 눈','crit=.22,critMul=.8'],['무한 탄창','dmg=.25,rate=.25,rng=.12'],['초월 출력','dmg=.4'],
+ ['광란의 포화','rate=.3,crit=.1'],['치명의 예술','critMul=1.5'],['처형자의 눈','dmg=.3,crit=.12'],
+ ['파멸의 낙인','shred=12,vuln=.3'],['약점 폭로','vuln=.35'],['구조 소멸','enemyHp=.15'],
+ /* 경제 12 */
+ ['배당금','goldKill=.65,goldWave=.8'],['중앙은행','interest=.1'],['무한 공장','buildDisc=.3,upDisc=.2'],
+ ['기술 혁명','upDisc=.35'],['금고 개방','gold=400,goldW=30'],['미다스의 손','killLuck=.3'],
+ ['전설의 현상금','bossGold=2.5'],['핵융합 발전소','passive=7'],['전쟁 특수','goldWave=1.2'],
+ ['재벌','goldKill=.4,interest=.05'],['무손실 재배치','sellBack=.3,buildDisc=.15'],['무상 원조','freeBuild=4'],
+ /* 생존 8 */
+ ['최후의 방벽','maxLives=8,last=1.2'],['재생 코어','regen=2'],['차원 회피','leakBlock=.3'],
+ ['불멸의 방벽','coreShield=4'],['시간 지연장','enemySpd=.15'],['생명의 순환','killHeal=.025'],
+ ['핵심 복원','maxLives=5,restore=1'],['전쟁 준비','prepBonus=12,callBonus=1.5'],
+ /* 상태이상 10 */
+ ['절대영도 탄','slow=.25,freeze=.04'],['태양 불꽃','burn=16'],['뇌격','stun=.14'],['연쇄 폭뢰','splash=60'],
+ ['폭풍 회로','chain=.3'],['영구 동토','freeze=.1'],['충격파 장갑','knock=.18'],['분자 분해','shredHit=2'],
+ ['용암','burn=12,slow=.12'],['천둥번개','chain=.2,splash=40,stun=.05'],
+ /* 조건부 8 */
+ ['기선 제압','first=1.5'],['일격 필살','fullHp=1'],['처형 선고','lowHp=1'],['철벽','near=.8'],
+ ['매의 눈','far=.8'],['최종 결전','bossWave=.8'],['처형자','exec=.12'],['하늘의 심판','air=1'],
+ /* 처치 6 */
+ ['핵분열 연쇄','corpse=.5'],['광전사','rush=.35'],['약탈 제국','killLuck=.2,goldKill=.25'],
+ ['멸종 교리','swarm=1'],['거인 학살','giant=.8'],['연쇄 붕괴','corpse=.3,chain=.15,killHeal=.01'],
+ /* 특수 5 */
+ ['완전 개조','retro=1'],['탄환 폭풍','multi=.18'],['유리 대포: 초월','dmg=1,maxLives=-8'],
+ ['악마의 거래','goldKill=1,goldWave=1,enemyHp=-.15'],['초가속','rate=.6,dmg=-.12']
+]};
+
+function parseFx(str){
+ const fx={}, parts=str.split(',');
+ for(let i=0;i<parts.length;i++){
+  const kv=parts[i].split('='), key=kv[0].trim(), v=parseFloat(kv[1]);
+  const dot=key.indexOf('.');
+  if(dot>0){ const k=key.slice(0,dot), s=key.slice(dot+1); if(!fx[k]) fx[k]={}; fx[k][s]=v; }
+  else fx[key]=v;
  }
- return out;
+ return fx;
 }
+const TAG_GROUP={
+ '화력':['dmg','rate','rng','crit','critMul','shred','vuln','enemyHp'],
+ '계열':['cDmg','cRate','cRng','sPow'],
+ '특효':['vs','swarm','giant','air','bossDmg'],
+ '경제':['goldKill','goldWave','interest','buildDisc','upDisc','sellBack','bossGold','killLuck','passive','callBonus','freeBuild','gold'],
+ '생존':['maxLives','regen','leakBlock','coreShield','enemySpd','killHeal','last','prepBonus','restore'],
+ '상태이상':['slow','burn','stun','splash','chain','freeze','knock','shredHit'],
+ '조건부':['first','fullHp','lowHp','near','far','bossWave','exec'],
+ '처치':['corpse','rush'],
+ '특수':['multi','retro']
+};
+function augTag(fx){
+ for(const k in fx) if(typeof fx[k]==='number'&&fx[k]<0) return '리스크';
+ const first=Object.keys(fx)[0];
+ for(const g in TAG_GROUP) if(TAG_GROUP[g].indexOf(first)>=0) return g;
+ return '특수';
+}
+const AUGMENTS=[], AUG_BY_ID={};
+for(let r=1;r<=3;r++){
+ const list=AUG_SPEC[r];
+ for(let i=0;i<list.length;i++){
+  const fx=parseFx(list[i][1]);
+  const tk=fx.tDmg||fx.tRate||fx.tRng;
+  const a={id:'a'+r+'_'+(i+1), r:r, n:list[i][0], fx:fx, tw:tk?Object.keys(tk)[0]:null, tag:'', d:''};
+  a.tag=a.tw?'전용':augTag(fx);
+  AUGMENTS.push(a); AUG_BY_ID[a.id]=a;
+ }
+}
+
+function pct(v){ return (v>=0?'+':'')+Math.round(v*100)+'%'; }
+const FX_TXT={
+ dmg:function(v){return '모든 방어탑 피해 '+pct(v);},
+ rate:function(v){return '모든 방어탑 연사 '+pct(v);},
+ rng:function(v){return '모든 방어탑 사거리 '+pct(v);},
+ crit:function(v){return '치명타 확률 '+pct(v);},
+ critMul:function(v){return '치명타 피해 '+pct(v);},
+ sPow:function(v){return '지원 계열 효과 '+pct(v);},
+ shred:function(v){return '모든 적 방어력 -'+v;},
+ vuln:function(v){return '적이 받는 피해 '+pct(v);},
+ enemyHp:function(v){return '적 최대 체력 '+pct(-v);},
+ enemySpd:function(v){return '적 이동 속도 '+pct(-v);},
+ swarm:function(v){return '드론·질주체·파편에게 피해 '+pct(v);},
+ giant:function(v){return '중장갑·차폐체·파괴자에게 피해 '+pct(v);},
+ air:function(v){return '공중 적에게 피해 '+pct(v);},
+ bossDmg:function(v){return '파괴자에게 피해 '+pct(v);},
+ goldKill:function(v){return '처치 에너지 '+pct(v);},
+ goldWave:function(v){return '웨이브 종료 보너스 '+pct(v);},
+ interest:function(v){return '웨이브 종료 시 보유 에너지의 '+Math.round(v*100)+'% 이자';},
+ buildDisc:function(v){return '건설 비용 '+pct(-v);},
+ upDisc:function(v){return '강화 비용 '+pct(-v);},
+ sellBack:function(v){return '해체 환급률 +'+Math.round(v*100)+'%p';},
+ bossGold:function(v){return '파괴자 처치 에너지 '+pct(v);},
+ killLuck:function(v){return '처치 시 '+Math.round(v*100)+'% 확률로 에너지 2배';},
+ passive:function(v){return '교전 중 초당 에너지 +'+v;},
+ callBonus:function(v){return '조기 호출 보너스 '+pct(v);},
+ freeBuild:function(v){return '다음 건설 '+v+'회 무료';},
+ regen:function(v){return '웨이브마다 코어 내구도 +'+v;},
+ leakBlock:function(v){return '침투를 '+Math.round(v*100)+'% 확률로 무효화';},
+ coreShield:function(v){return '웨이브마다 침투 '+v+'회 차단';},
+ killHeal:function(v){return '처치 시 '+(Math.round(v*1000)/10)+'% 확률로 내구도 +1';},
+ last:function(v){return '내구도 5 이하일 때 피해 '+pct(v);},
+ prepBonus:function(v){return '웨이브 사이 준비 시간 +'+v+'초';},
+ slow:function(v){return '모든 공격이 '+Math.round(v*100)+'% 감속 부여';},
+ burn:function(v){return '모든 공격이 초당 '+v+' 화상 부여';},
+ stun:function(v){return '모든 공격이 '+Math.round(v*100)+'% 확률로 기절';},
+ splash:function(v){return '모든 공격에 반경 '+(Math.round(v/TILE*10)/10)+'칸 폭발 추가';},
+ chain:function(v){return '모든 공격이 '+Math.round(v*100)+'% 확률로 연쇄';},
+ freeze:function(v){return '모든 공격이 '+Math.round(v*100)+'% 확률로 빙결';},
+ knock:function(v){return '모든 공격이 '+Math.round(v*100)+'% 확률로 적을 밀어냄';},
+ shredHit:function(v){return '명중마다 적 방어력 -'+v+' 누적 (최대 -15)';},
+ first:function(v){return '웨이브 시작 4초간 피해 '+pct(v);},
+ fullHp:function(v){return '체력이 가득 찬 적에게 피해 '+pct(v);},
+ lowHp:function(v){return '체력 35% 이하 적에게 피해 '+pct(v);},
+ near:function(v){return '2칸 이내 적에게 피해 '+pct(v);},
+ far:function(v){return '4칸 밖 적에게 피해 '+pct(v);},
+ bossWave:function(v){return '파괴자가 전장에 있으면 피해 '+pct(v);},
+ exec:function(v){return '체력 '+Math.round(v*100)+'% 이하 적 즉시 파괴 (파괴자 제외)';},
+ corpse:function(v){return '처치 시 최대 체력의 '+Math.round(v*100)+'%로 폭발';},
+ rush:function(v){return '처치 시 3초간 연사 '+pct(v);},
+ multi:function(v){return Math.round(v*100)+'% 확률로 즉시 재발사';}
+};
+function augDesc(a){
+ const fx=a.fx, out=[];
+ for(const k in fx){
+  const v=fx[k];
+  if(k==='goldW') continue;
+  if(typeof v==='object'){
+   for(const s in v){
+    const x=v[s], sup=TOWERS[s]&&TOWERS[s].hits==='none';
+    if(k==='cDmg') out.push(CAT_N[s]+' 계열 피해 '+pct(x));
+    else if(k==='cRate') out.push(CAT_N[s]+' 계열 연사 '+pct(x));
+    else if(k==='cRng') out.push(CAT_N[s]+(s==='sup'?' 계열 영향 반경 ':' 계열 사거리 ')+pct(x));
+    else if(k==='tDmg') out.push(TOWERS[s].name+(sup?' 효과 ':' 피해 ')+pct(x));
+    else if(k==='tRate') out.push(TOWERS[s].name+' 연사 '+pct(x));
+    else if(k==='tRng') out.push(TOWERS[s].name+(sup?' 영향 반경 ':' 사거리 ')+pct(x));
+    else if(k==='vs') out.push(VS_N[s]+'에게 피해 '+pct(x));
+   }
+   continue;
+  }
+  if(k==='gold'){ out.push('즉시 에너지 +'+Math.round(v+(fx.goldW||0)*G.wave)+(fx.goldW?' (웨이브 비례)':'')); continue; }
+  if(k==='maxLives'){ out.push(v>0?'최대 내구도 +'+v+' (즉시 회복)':'최대 내구도 '+v); continue; }
+  if(k==='restore'){ out.push('코어 내구도 완전 회복'); continue; }
+  if(k==='retro'){ out.push('보유한 모든 방어탑을 즉시 1단계 무료 강화'); continue; }
+  out.push(FX_TXT[k]?FX_TXT[k](v):k);
+ }
+ return out.join(', ');
+}
+function applyAug(a){
+ const fx=a.fx;
+ for(const k in fx){
+  const v=fx[k];
+  if(typeof v==='object'){ for(const s in v) AUG[k][s]=(AUG[k][s]||0)+v[s]; continue; }
+  if(k==='goldW') continue;
+  if(k==='gold'){ const g=Math.round(v+(fx.goldW||0)*G.wave); G.gold+=g; G.earned+=g; flashGold(); continue; }
+  if(k==='maxLives'){
+   if(v>0){ G.maxLives+=v; G.lives+=v; }
+   else { G.maxLives=Math.max(1,G.maxLives+v); G.lives=Math.max(1,Math.min(G.lives,G.maxLives)); }
+   continue;
+  }
+  if(k==='restore'){ G.lives=Math.max(G.lives,G.maxLives); continue; }
+  if(k==='retro'){
+   for(let i=0;i<G.towers.length;i++){
+    const t=G.towers[i];
+    if(t.lv<3){ t.lv++; ring(t.x,t.y,tstat(t).rng||40,t.D.col,.6,2); }
+   }
+   continue;
+  }
+  if(AUG[k]!==undefined) AUG[k]+=v;
+ }
+}
+function ownsTower(id){
+ for(let i=0;i<G.towers.length;i++) if(G.towers[i].id===id) return true;
+ return false;
+}
+/* 등급 추첨 후, 보유한 방어탑의 전용 증강이 더 자주 뜨도록 가중 */
 function rollAugments(n){
- const pool=augPool(), picks=[];
- const w=G.wave;
- const wt=[0, 62, 30, 8];
+ const pool=[], picks=[], owned={};
+ for(let i=0;i<AUGMENTS.length;i++) if(!AUG.taken[AUGMENTS[i].id]) pool.push(AUGMENTS[i]);
+ for(let i=0;i<G.towers.length;i++) owned[G.towers[i].id]=1;
+ const w=G.wave, wt=[0,62,30,8];
  if(w>=10){ wt[1]=52; wt[2]=35; wt[3]=13; }
  if(w>=20){ wt[1]=42; wt[2]=39; wt[3]=19; }
  if(w>=30){ wt[1]=32; wt[2]=42; wt[3]=26; }
  for(let k=0;k<n&&pool.length;k++){
-  let r=Math.random()*(wt[1]+wt[2]+wt[3]);
-  let tier=r<wt[1]?1:(r<wt[1]+wt[2]?2:3);
-  let band=pool.filter(function(a){return a.r===tier;});
+  const r=Math.random()*(wt[1]+wt[2]+wt[3]);
+  const tier=r<wt[1]?1:(r<wt[1]+wt[2]?2:3);
+  let band=pool.filter(function(a){ return a.r===tier; });
   if(!band.length) band=pool.slice();
-  const pick=band[(Math.random()*band.length)|0];
+  let tot=0;
+  const ws=band.map(function(a){ const x=a.tw?(owned[a.tw]?3:.5):1; tot+=x; return x; });
+  let roll=Math.random()*tot, pick=band[band.length-1];
+  for(let j=0;j<band.length;j++){ roll-=ws[j]; if(roll<=0){ pick=band[j]; break; } }
   picks.push(pick);
-  const idx=pool.indexOf(pick); if(idx>=0) pool.splice(idx,1);
+  pool.splice(pool.indexOf(pick),1);
  }
  return picks;
 }
@@ -831,7 +1092,7 @@ function beam(x1,y1,x2,y2,col,life,w){ G.fx.push({k:'beam',x1:x1,y1:y1,x2:x2,y2:
 /* ═══════════ 침공체 ═══════════ */
 function makeEnemy(type,waveN,dist){
  const D=ENEMIES[type];
- const hs=hpScale(waveN)*G.D.hp*(G.chaos?chaosHp(waveN):1);
+ const hs=hpScale(waveN)*G.D.hp*(G.chaos?chaosHp(waveN):1)*clamp(1-AUG.enemyHp,.5,1.5);
  const e={
   type:type,D:D,waveN:waveN,r:D.r,col:D.col,air:!!D.air,
   maxHp:D.hp*hs, hp:D.hp*hs,
@@ -839,7 +1100,7 @@ function makeEnemy(type,waveN,dist){
   shred:0, vuln:0, cursed:false,
   gold:Math.max(1,Math.round(D.gold*goldScale(waveN))),
   dist:dist||0, x:0,y:0, ang:0, prog:0,
-  spd:D.spd*G.D.spd*(G.chaos?chaosSpd(waveN):1), slow:0, slowT:0, freeze:0, stun:0, pois:[],
+  spd:D.spd*G.D.spd*(G.chaos?chaosSpd(waveN):1)*clamp(1-AUG.enemySpd,.6,1.2), slow:0, slowT:0, freeze:0, stun:0, pois:[], brk:0,
   shield:D.shield?D.shield.amt*hs:0, shieldMax:D.shield?D.shield.amt*hs:0, shieldT:0,
   healCd:rnd(0,1), spawnCd:3, alive:true, hitT:0, hasted:false,
   wob:Math.random()*TAU, spin:rnd(-1.6,1.6), age:0
@@ -853,20 +1114,36 @@ function hurt(e,amount,o){
  if(!e.alive||amount<=0) return 0;
  let dmg=amount, crit=false;
  const src=o.src, direct=(src&&!o.pure&&!o.aug);
+ const fullBefore=e.hp>=e.maxHp*.999;
  if(direct&&src.cc>0&&!o.nocrit&&Math.random()<src.cc){ crit=true; dmg*=src.cm; }
  if(e.D.dr) dmg*=(1-e.D.dr);
- if(AUG.swarm&&e.D.cls==='swarm') dmg*=(1+AUG.swarm);
- if(AUG.giant&&e.D.cls==='giant') dmg*=(1+AUG.giant);
- if(AUG.air&&e.air) dmg*=(1+AUG.air);
+ /* 특효·조건부 보너스는 한 묶음으로 합산 */
+ let mul=1;
+ const vk=e.D.vsKey||e.type;
+ if(AUG.vs[vk]) mul+=AUG.vs[vk];
+ if(AUG.swarm&&e.D.cls==='swarm') mul+=AUG.swarm;
+ if(AUG.giant&&e.D.cls==='giant') mul+=AUG.giant;
+ if(AUG.bossDmg&&e.D.boss) mul+=AUG.bossDmg;
+ if(AUG.air&&e.air) mul+=AUG.air;
+ if(AUG.first&&G.waveOn&&G.waveT<4) mul+=AUG.first;
+ if(AUG.last&&G.lives<=5) mul+=AUG.last;
+ if(AUG.bossWave&&G.bossOn) mul+=AUG.bossWave;
+ if(AUG.fullHp&&direct&&fullBefore) mul+=AUG.fullHp;
+ if(AUG.lowHp&&e.hp<=e.maxHp*.35) mul+=AUG.lowHp;
+ if(src&&(AUG.near||AUG.far)){
+  const dd=d2(src.x,src.y,e.x,e.y);
+  if(AUG.near&&dd<=6400) mul+=AUG.near;
+  if(AUG.far&&dd>=25600) mul+=AUG.far;
+ }
+ dmg*=mul;
  const vul=AUG.vuln+(e.vuln||0);
  if(vul) dmg*=(1+vul);
- if(AUG.first&&G.waveOn&&G.waveT<4) dmg*=(1+AUG.first);
- if(AUG.last&&G.lives<=5) dmg*=(1+AUG.last);
  if(!o.pure){
-  const ar=Math.max(0,(e.armor-AUG.shred-(e.shred||0))*(1-(o.pen||0)));
+  const ar=Math.max(0,(e.armor-AUG.shred-(e.shred||0)-(e.brk||0))*(1-(o.pen||0)));
   dmg=Math.max(dmg*0.12,dmg-ar);
  }
- if(AUG.exec&&direct&&!e.D.boss&&e.shield<=0&&e.hp>0&&e.hp/e.maxHp<=AUG.exec){
+ const ex=Math.min(.2,AUG.exec);
+ if(ex&&direct&&!e.D.boss&&e.shield<=0&&e.hp>0&&e.hp/e.maxHp<=ex){
   say(e.x,e.y-e.r-6,'처형','#ff6bd6',14); dmg=e.hp+1;
  }
  if(e.shield>0){
@@ -881,12 +1158,24 @@ function hurt(e,amount,o){
  if(direct) augOnHit(e,src,dmg);
  return dmg;
 }
+/* 적중 시 증강 효과. 기절·빙결·넉백은 적마다 재발동 대기시간이 있어 영구 제어가 되지 않는다 */
 function augOnHit(e,src,dmg){
- if(AUG.slow>0&&!e.D.noSlow){ if(AUG.slow>e.slow||e.slowT<=0) e.slow=Math.max(e.slow,AUG.slow); e.slowT=Math.max(e.slowT,1.2); }
+ const sl=Math.min(.5,AUG.slow);
+ if(sl>0&&!e.D.noSlow){ if(sl>e.slow||e.slowT<=0) e.slow=Math.max(e.slow,sl); e.slowT=Math.max(e.slowT,1.2); }
  if(AUG.burn>0) poison(e,AUG.burn,3,3,src);
- if(AUG.stun>0&&Math.random()<AUG.stun) e.stun=Math.max(e.stun,.4);
+ if(AUG.stun>0&&(e.scd||0)<=G.time&&Math.random()<Math.min(.35,AUG.stun)){ e.stun=Math.max(e.stun,.4); e.scd=G.time+1.2; }
+ if(AUG.freeze>0&&!e.D.noSlow&&(e.fcd||0)<=G.time&&Math.random()<Math.min(.25,AUG.freeze)){
+  e.freeze=Math.max(e.freeze,e.D.boss?.3:.8); e.fcd=G.time+2;
+  ring(e.x,e.y,e.r+9,'#bfe6ff',.35,2);
+ }
+ if(AUG.knock>0&&!e.D.boss&&(e.kcd||0)<=G.time&&Math.random()<Math.min(.35,AUG.knock)){
+  e.kcd=G.time+1.2;
+  e.dist=Math.max(0,e.dist-TILE*.8);
+  const p=e.air?airAt(e.dist):ptAt(e.dist); e.x=p.x; e.y=p.y;
+ }
+ if(AUG.shredHit>0) e.brk=Math.min(15,(e.brk||0)+AUG.shredHit);
  if(AUG.splash>0&&dmg>0){
-  const r=AUG.splash, r2=r*r, n=G.enemies.length;
+  const r=Math.min(80,AUG.splash), r2=r*r, n=G.enemies.length;
   for(let i=0;i<n;i++){
    const o2=G.enemies[i];
    if(!o2.alive||o2===e||d2(e.x,e.y,o2.x,o2.y)>r2) continue;
@@ -894,7 +1183,8 @@ function augOnHit(e,src,dmg){
   }
   ring(e.x,e.y,r,'#ffb066',.2,1.5);
  }
- if(AUG.chain>0&&Math.random()<AUG.chain){
+ const ch=Math.min(.6,AUG.chain);
+ if(ch>0&&Math.random()<ch){
   let best=null,bd=92*92, n=G.enemies.length;
   for(let i=0;i<n;i++){
    const o2=G.enemies[i];
@@ -911,15 +1201,33 @@ function kill(e,src){
  let gain=e.gold*(1+AUG.goldKill)*(G.chaos?1.35:1);
  if(e.cursed) gain*=2;
  if(e.D.boss) gain*=(1+AUG.bossGold);
+ const lucky=AUG.killLuck>0&&Math.random()<Math.min(.5,AUG.killLuck);
+ if(lucky) gain*=2;
  e.gold=Math.max(1,Math.round(gain));
  G.gold+=e.gold; G.earned+=e.gold; G.score+=Math.round(e.D.pt*G.D.mult);
  if(!e.D.noCount) G.killed++;
  flashGold();
  if(src){ src.kills++; }
  burst(e.x,e.y,e.col,e.D.boss?54:11,e.D.boss?4.2:1.6);
- say(e.x,e.y-e.r-4,'+'+e.gold,'#ffc247',e.D.boss?18:11);
+ say(e.x,e.y-e.r-4,'+'+e.gold,lucky?'#fff08a':'#ffc247',e.D.boss?18:(lucky?14:11));
  if(e.D.boss){ G.shake=Math.max(G.shake,18); boom(e.x,e.y,90,'#ff5b6e'); SND.play('bigdie'); feed('<b>'+e.D.name+'</b> 격파','good'); }
  else SND.play('die',40);
+ if(AUG.rush>0) G.rushT=3;
+ if(AUG.killHeal>0&&G.lives<G.maxLives&&Math.random()<AUG.killHeal){
+  G.lives++; say(G.path.core.x,G.path.core.y-34,'+1 내구도','#5ef2a4',14);
+ }
+ /* 잔해 폭발 — 연쇄되지만 깊이 제한으로 무한 재귀를 막는다 */
+ if(AUG.corpse>0&&G.corpseDepth<12){
+  G.corpseDepth++;
+  const r=58, r2=r*r, amt=e.maxHp*Math.min(.6,AUG.corpse), n=G.enemies.length;
+  ring(e.x,e.y,r,'#ff9a3c',.3,2);
+  for(let i=0;i<n;i++){
+   const o=G.enemies[i];
+   if(!o.alive||d2(e.x,e.y,o.x,o.y)>r2) continue;
+   hurt(o,amt,{src:src,aug:true,silent:true,nocrit:true});
+  }
+  G.corpseDepth--;
+ }
  if(e.D.split){
   for(let i=0;i<e.D.split[1];i++){
    const s=makeEnemy(e.D.split[0],e.waveN,Math.max(0,e.dist-i*14));
@@ -929,9 +1237,21 @@ function kill(e,src){
 }
 function leak(e){
  e.alive=false;
+ const c=G.path.core;
+ if(G.cShield>0){
+  G.cShield--;
+  ring(c.x,c.y,54,'#9df0ff',.5,3); say(c.x,c.y-40,'차단','#9df0ff',15); SND.play('die',80);
+  feed('코어 보호막이 <b>'+e.D.name+'</b>을(를) 막았습니다 · 남은 보호막 '+G.cShield,'good');
+  return;
+ }
+ if(AUG.leakBlock>0&&Math.random()<Math.min(.6,AUG.leakBlock)){
+  ring(c.x,c.y,54,'#b9c6ff',.5,3); say(c.x,c.y-40,'회피','#b9c6ff',15);
+  feed('<b>'+e.D.name+'</b> 침투 회피','good');
+  return;
+ }
  G.lives-=e.D.leak; G.leaked++;
  G.shake=Math.max(G.shake,e.D.boss?22:9); G.flash=1;
- boom(G.path.core.x,G.path.core.y,64,'#ff4d6d');
+ boom(c.x,c.y,64,'#ff4d6d');
  SND.play('leak',100);
  feed('<b>'+e.D.name+'</b> 코어 침투 · 내구도 -'+e.D.leak,'bad');
  if(G.lives<=0){ G.lives=0; finish(false); }
@@ -945,10 +1265,24 @@ function makeTower(id,tx,ty){
   recoil:0, spin:0, bd:0, br:0, bg:0, bc:0, bcm:0, cc:0, cm:1.9,
   lock:null, lockT:0, mines:0, born:G.time};
 }
+function supPow(t){ return 1+AUG.sPow+(AUG.tDmg[t.id]||0); }
+function supRng(t){ const L=t.D.lv[t.lv]; return (L.rng||0)*(1+(AUG.cRng.sup||0)+(AUG.tRng[t.id]||0)); }
+function scaleSup(L,pw){
+ const o={};
+ for(const k in L) o[k]=L[k];
+ const ks=['ad','ar','ac','abg','vuln','rep'];
+ for(let i=0;i<ks.length;i++) if(o[ks[i]]!==undefined) o[ks[i]]=o[ks[i]]*pw;
+ if(o.shred!==undefined) o.shred=Math.round(o.shred*pw*10)/10;
+ if(o.yield!==undefined) o.yield=Math.round(o.yield*pw);
+ return o;
+}
 function tstat(t){
- const L=t.D.lv[t.lv];
- return {dmg:(L.dmg||0)*(1+t.bd+AUG.dmg), dps:(L.dps||0)*(1+t.bd+AUG.dmg),
-  rate:(L.rate||0)*(1+t.br+AUG.rate), rng:(L.rng||0)*(1+t.bg+AUG.rng),
+ const L=t.D.lv[t.lv], id=t.id, c=CAT_OF[id], sup=t.D.hits==='none';
+ const dm=Math.max(.3,1+t.bd+AUG.dmg+(AUG.cDmg[c]||0)+(AUG.tDmg[id]||0));
+ const rm=Math.max(.3,1+t.br+AUG.rate+(AUG.cRate[c]||0)+(AUG.tRate[id]||0)+(G.rushT>0?AUG.rush:0));
+ const gm=Math.max(.5,1+t.bg+AUG.rng+(AUG.cRng[c]||0)+(AUG.tRng[id]||0));
+ return {dmg:(L.dmg||0)*dm, dps:(L.dps||0)*dm,
+  rate:(L.rate||0)*rm, rng:sup?supRng(t):(L.rng||0)*gm, pw:sup?supPow(t):1,
   splash:L.splash||0, slow:L.slow||0, sdur:L.sdur||0, chain:L.chain||0,
   dot:L.dot||0, ddur:L.ddur||0, crit:L.crit||0, cmul:L.cmul||0,
   pellets:L.pellets||0, spread:L.spread||0, salvo:L.salvo||0, airx:L.airx||1,
@@ -967,20 +1301,20 @@ function refreshBuffs(){
  if(any) for(let i=0;i<n;i++){
   const a=G.towers[i];
   if(a.id!=='amp'&&a.id!=='chrono'&&a.id!=='radar') continue;
-  const L=a.D.lv[a.lv], r2=L.rng*L.rng;
+  const L=a.D.lv[a.lv], R=supRng(a), r2=R*R, pw=supPow(a);
   for(let j=0;j<n;j++){
    const t=G.towers[j];
    if(t===a||t.D.hits==='none') continue;
    if(d2(a.x,a.y,t.x,t.y)>r2) continue;
-   if(a.id==='amp'){ t.bd+=L.ad; t.br+=L.ar; if(a.lv===3) t.bg+=.10; }
-   else if(a.id==='chrono'){ t.br+=L.ar; }
-   else { t.bc+=L.ac; t.bg+=L.abg; if(a.lv===3) t.bcm+=.5; }
+   if(a.id==='amp'){ t.bd+=L.ad*pw; t.br+=L.ar*pw; if(a.lv===3) t.bg+=.10; }
+   else if(a.id==='chrono'){ t.br+=L.ar*pw; }
+   else { t.bc+=L.ac*pw; t.bg+=L.abg*pw; if(a.lv===3) t.bcm+=.5; }
   }
  }
  for(let i=0;i<n;i++){
   const t=G.towers[i];
-  t.bd=Math.min(t.bd,1.2); t.br=Math.min(t.br,1.0);
-  t.bg=Math.min(t.bg,.45); t.bc=Math.min(t.bc,.6);
+  t.bd=Math.min(t.bd,1.8); t.br=Math.min(t.br,1.4);
+  t.bg=Math.min(t.bg,.6); t.bc=Math.min(t.bc,.7);
  }
 }
 /* 저주·시간붕괴 오라를 적에게 각인 */
@@ -990,13 +1324,13 @@ function applyAuras(){
  for(let i=0;i<G.towers.length;i++){
   const t=G.towers[i];
   if(t.id!=='curse'&&!(t.id==='chrono'&&t.lv===3)) continue;
-  const L=t.D.lv[t.lv], r2=L.rng*L.rng;
+  const L=t.D.lv[t.lv], R=supRng(t), r2=R*R, pw=supPow(t);
   for(let j=0;j<n;j++){
    const e=G.enemies[j];
    if(!e.alive||d2(t.x,t.y,e.x,e.y)>r2) continue;
    if(t.id==='curse'){
-    if(L.shred>e.shred) e.shred=L.shred;
-    if(L.vuln>e.vuln) e.vuln=L.vuln;
+    if(L.shred*pw>e.shred) e.shred=L.shred*pw;
+    if(L.vuln*pw>e.vuln) e.vuln=L.vuln*pw;
     if(t.lv===3) e.cursed=true;
    } else if(!e.D.noSlow){
     if(e.slow<.2||e.slowT<=0) e.slow=Math.max(e.slow,.2);
@@ -1005,8 +1339,11 @@ function applyAuras(){
   }
  }
 }
-function buildCost(id){ return Math.max(10,Math.round(TOWERS[id].cost*(1-AUG.buildDisc))); }
-function upCost(t){ return t.lv>=3?0:Math.max(5,Math.round(t.D.lv[t.lv+1].cost*(1-AUG.upDisc))); }
+function buildCost(id){
+ if(AUG.freeBuild>=1) return 0;
+ return Math.max(10,Math.round(TOWERS[id].cost*(1-Math.min(.6,AUG.buildDisc))));
+}
+function upCost(t){ return t.lv>=3?0:Math.max(5,Math.round(t.D.lv[t.lv+1].cost*(1-Math.min(.6,AUG.upDisc)))); }
 function sellValue(t){ return Math.floor(t.spent*Math.min(1,.7+AUG.sellBack)); }
 
 /* ═══════════ 조준 · 사격 ═══════════ */
@@ -1467,6 +1804,7 @@ function updateEnemies(dt){
   const e=G.enemies[i]; e.hasted=false;
   if(e.alive&&e.D.aura){ if(!bosses) bosses=[]; bosses.push(e); }
  }
+ G.bossOn=!!bosses;
  if(bosses) for(let b=0;b<bosses.length;b++){
   const B=bosses[b], r2=B.D.aura.rad*B.D.aura.rad;
   for(let i=0;i<G.enemies.length;i++){ const e=G.enemies[i];
@@ -1549,7 +1887,7 @@ function updateEnemies(dt){
 function startWave(){
  if(G.waveOn||G.scene!=='play') return;
  G.wave++;
- G.waveOn=true; G.waveT=0; G.queue=[];
+ G.waveOn=true; G.waveT=0; G.queue=[]; G.cShield=Math.round(AUG.coreShield);
  const def=waveDef(G.wave);
  const mul=G.chaos?chaosCount(G.wave):1;
  let boss=false;
@@ -1574,8 +1912,8 @@ function endWave(){
  let mined=0, repair=0, compound=0;
  for(let i=0;i<G.towers.length;i++){
   const t=G.towers[i], L=t.D.lv[t.lv];
-  if(t.id==='mint'){ mined+=L.yield; if(t.lv===3) compound+=.03; }
-  else if(t.id==='mender') repair+=L.rep;
+  if(t.id==='mint'){ mined+=Math.round(L.yield*supPow(t)); if(t.lv===3) compound+=.03; }
+  else if(t.id==='mender') repair+=L.rep*supPow(t);
  }
  const interest=Math.round(G.gold*(AUG.interest+compound));
  bonus+=mined+interest;
@@ -1592,13 +1930,12 @@ function endWave(){
   const over=hasMenderPerk()?5:0;
   const cap=G.maxLives+over;
   while(G.repBank>=1&&G.lives<cap){ G.repBank-=1; G.lives++; }
-  if(G.lives>G.maxLives) G.maxLives=G.lives;
   if(repair+AUG.regen>0&&G.lives<cap) feed('코어 수리 진행 <b>'+Math.floor((G.repBank%1)*100)+'%</b>');
  }
  SND.intensity=.25;
  if(!G.endless&&!G.chaos&&G.wave>=LAST_WAVE){ finish(true); return; }
  if(G.chaos&&G.wave%10===0) banner('생존 '+G.wave+' 웨이브','아수라장 돌파');
- G.prepMax=G.chaos?14:12; G.prep=G.prepMax;
+ G.prepMax=(G.chaos?14:12)+AUG.prepBonus; G.prep=G.prepMax;
  syncUI();
  if(G.chaos&&(G.wave===1||(G.wave-1)%3===0)){ offerAugments(); return; }
 }
@@ -1608,7 +1945,7 @@ function hasMenderPerk(){
 }
 function callWave(){
  if(G.scene!=='play'||G.waveOn) return;
- const b=Math.ceil(G.prep)*3;
+ const b=Math.round(Math.ceil(G.prep)*3*(1+AUG.callBonus));
  if(b>0){
   G.gold+=b; G.earned+=b; flashGold();
   say(G.path.core.x,G.path.core.y-30,'조기 호출 +'+b,'#5ef2a4',14);
@@ -1625,6 +1962,7 @@ function tryPlace(tx,ty){
  if(!buildable(tx,ty)){ SND.play('nope',140); return; }
  if(G.gold<price){ SND.play('nope',140); feed('에너지가 부족합니다 · <b>'+price+'</b> 필요','warn'); return; }
  G.gold-=price;
+ if(price===0&&AUG.freeBuild>=1){ AUG.freeBuild--; feed('무상 건설 사용 · 남은 횟수 <b>'+Math.floor(AUG.freeBuild)+'</b>','good'); }
  const t=makeTower(G.buy,tx,ty);
  G.towers.push(t); G.occ[ty*COLS+tx]=t;
  refreshBuffs();
@@ -1682,6 +2020,8 @@ function step(dt){
  if(G.scene!=='play') return;
 
  refreshBuffs();
+ if(G.rushT>0) G.rushT-=dt;
+ if(G.waveOn&&AUG.passive>0){ G.pAcc+=AUG.passive*dt; if(G.pAcc>=1){ const g=Math.floor(G.pAcc); G.pAcc-=g; G.gold+=g; G.earned+=g; } }
 
  if(G.waveOn){
   G.waveT+=dt;
@@ -1706,7 +2046,10 @@ function step(dt){
   if(t.id==='beam'){ updateBeam(t,dt); continue; }
   t.cd-=dt;
   if(t.cd<=0){
-   if(fire(t)){ const s=tstat(t); t.cd=1/Math.max(.05,s.rate); }
+   if(fire(t)){
+    const s=tstat(t); t.cd=1/Math.max(.05,s.rate);
+    if(AUG.multi>0&&Math.random()<Math.min(.4,AUG.multi)) t.cd=Math.min(t.cd,.07);
+   }
    else t.cd=.09;
   }
  }
@@ -2497,7 +2840,7 @@ function renderDetail(){
  if(!id){ E.detail.classList.remove('show'); return; }
  E.detail.classList.add('show');
  const D=TOWERS[id], lv=t?t.lv:0;
- const s=tstat(t||{D:D,lv:0,bd:0,br:0,bg:0,bc:0,bcm:0});
+ const s=tstat(t||{id:id,D:D,lv:0,bd:0,br:0,bg:0,bc:0,bcm:0});
  const nx=(t&&lv<3)?D.lv[lv+1]:null;
  const delta=function(a,b,suf,pct){
   if(!nx||b===undefined||b===null||a===b) return '';
@@ -2510,26 +2853,26 @@ function renderDetail(){
  const tiles=v=>Math.round(v/TILE*10)/10+'칸';
  let rows='';
  if(D.hits==='none'){
-  const L=s.raw;
+  const pw=s.pw||1, L=scaleSup(s.raw,pw), nx2=nx?scaleSup(nx,pw):null;
   if(id==='amp'){
-   rows+=statRow('위력 증폭','+'+Math.round(L.ad*100)+'%',nx?' ▲'+Math.round((nx.ad-L.ad)*100)+'%':'');
-   rows+=statRow('연사 증폭','+'+Math.round(L.ar*100)+'%',nx?' ▲'+Math.round((nx.ar-L.ar)*100)+'%':'');
+   rows+=statRow('위력 증폭','+'+Math.round(L.ad*100)+'%',nx2?' ▲'+Math.round((nx2.ad-L.ad)*100)+'%':'');
+   rows+=statRow('연사 증폭','+'+Math.round(L.ar*100)+'%',nx2?' ▲'+Math.round((nx2.ar-L.ar)*100)+'%':'');
   } else if(id==='chrono'){
-   rows+=statRow('연사 증폭','+'+Math.round(L.ar*100)+'%',nx?' ▲'+Math.round((nx.ar-L.ar)*100)+'%':'');
+   rows+=statRow('연사 증폭','+'+Math.round(L.ar*100)+'%',nx2?' ▲'+Math.round((nx2.ar-L.ar)*100)+'%':'');
   } else if(id==='radar'){
-   rows+=statRow('치명타 부여','+'+Math.round(L.ac*100)+'%',nx?' ▲'+Math.round((nx.ac-L.ac)*100)+'%':'');
-   rows+=statRow('사거리 증폭','+'+Math.round(L.abg*100)+'%',nx?' ▲'+Math.round((nx.abg-L.abg)*100)+'%':'');
+   rows+=statRow('치명타 부여','+'+Math.round(L.ac*100)+'%',nx2?' ▲'+Math.round((nx2.ac-L.ac)*100)+'%':'');
+   rows+=statRow('사거리 증폭','+'+Math.round(L.abg*100)+'%',nx2?' ▲'+Math.round((nx2.abg-L.abg)*100)+'%':'');
   } else if(id==='curse'){
-   rows+=statRow('방어력 감소','-'+L.shred,nx?' ▲'+(nx.shred-L.shred):'');
-   rows+=statRow('받는 피해','+'+Math.round(L.vuln*100)+'%',nx?' ▲'+Math.round((nx.vuln-L.vuln)*100)+'%':'');
+   rows+=statRow('방어력 감소','-'+L.shred,nx2?' ▲'+(nx2.shred-L.shred):'');
+   rows+=statRow('받는 피해','+'+Math.round(L.vuln*100)+'%',nx2?' ▲'+Math.round((nx2.vuln-L.vuln)*100)+'%':'');
   } else if(id==='mint'){
-   rows+=statRow('웨이브 생산',L.yield+' 에너지',nx?' ▲'+(nx.yield-L.yield):'');
+   rows+=statRow('웨이브 생산',L.yield+' 에너지',nx2?' ▲'+(nx2.yield-L.yield):'');
    rows+=statRow('회수까지',Math.ceil((t?t.spent:D.cost)/L.yield)+' 웨이브','');
   } else if(id==='mender'){
-   rows+=statRow('수리 속도',Math.round(L.rep*100)/100+' / 웨이브',nx?' ▲'+Math.round((nx.rep-L.rep)*100)/100:'');
+   rows+=statRow('수리 속도',Math.round(L.rep*100)/100+' / 웨이브',nx2?' ▲'+Math.round((nx2.rep-L.rep)*100)/100:'');
    rows+=statRow('내구도 1당',Math.ceil(1/L.rep)+' 웨이브','');
   }
-  if(L.rng) rows+=statRow('영향 반경',tiles(s.rng),nx?' ▲'+tiles(nx.rng-L.rng):'');
+  if(L.rng) rows+=statRow('영향 반경',tiles(s.rng),nx2?' ▲'+tiles(nx2.rng-L.rng):'');
   if(t&&L.rng){
    let n=0; const r2=s.rng*s.rng;
    for(let i=0;i<G.towers.length;i++){ const o=G.towers[i];
@@ -2636,7 +2979,7 @@ function syncFast(force){
  }
  const pct=(!G.waveOn&&G.prepMax>0)?clamp(G.prep/G.prepMax,0,1)*100:0;
  E.mftimer.style.width=pct+'%';
- const label=G.waveOn?'교전 진행 중':('웨이브 '+(G.wave+1)+' 호출 · +'+(Math.ceil(G.prep)*3));
+ const label=G.waveOn?'교전 진행 중':('웨이브 '+(G.wave+1)+' 호출 · +'+Math.round(Math.ceil(G.prep)*3*(1+AUG.callBonus)));
  if(uiCache.call!==label){
   uiCache.call=label;
   E.call.innerHTML=label+(G.waveOn?'':' <kbd>Space</kbd>');
@@ -2719,21 +3062,25 @@ function syncDiffBadge(){
 /* ═══════════ 증강 선택 ═══════════ */
 function offerAugments(){
  const picks=rollAugments(3);
- if(!picks.length){ return false; }
+ if(!picks.length) return false;
  G.scene='aug';
  G.buy=null; G.sel=null;
  let cards='';
  for(let i=0;i<picks.length;i++){
   const a=picks[i], R=RARITY[a.r];
   cards+='<button type="button" class="augcard r'+a.r+'" data-aug="'+a.id+'">'+
-   '<span class="rr">'+R.n+'</span><span class="an">'+a.n+'</span><span class="ad">'+a.d+'</span></button>';
+   '<span class="ahead"><span class="rr">'+R.n+'</span><span class="at">'+a.tag+'</span></span>'+
+   (a.tw?'<span class="ai">'+tIcon(a.tw,26)+'</span>':'')+
+   '<span class="an">'+a.n+'</span><span class="ad">'+augDesc(a)+'</span>'+
+   (a.tw&&!ownsTower(a.tw)?'<span class="aw">아직 설치하지 않은 방어탑</span>':'')+
+   '</button>';
  }
  E.sheet.innerHTML=
   '<div class="verdict">증강 선택 · 웨이브 '+G.wave+' 돌파</div>'+
   '<h1>하나를 골라라</h1>'+
   '<p class="tag">아수라장에서는 웨이브가 오를수록 침공체의 체력·장갑·속도·물량이 함께 치솟습니다. 증강 없이는 버틸 수 없습니다.</p>'+
   '<div class="augs">'+cards+'</div>'+
-  '<p class="best" style="margin-top:14px">현재 보유 증강 <b>'+AUG.list.length+'</b>개 · 다음 선택은 3웨이브 뒤</p>';
+  '<p class="best" style="margin-top:14px">보유 증강 <b>'+AUG.list.length+'</b>개 · 전체 '+AUGMENTS.length+'종 · 다음 선택은 3웨이브 뒤</p>';
  E.veil.classList.remove('hide');
  const cs=E.sheet.querySelectorAll('[data-aug]');
  for(let i=0;i<cs.length;i++) cs[i].addEventListener('click',function(){
@@ -2743,12 +3090,12 @@ function offerAugments(){
  return true;
 }
 function takeAugment(id){
- let a=null;
- for(let i=0;i<AUGMENTS.length;i++) if(AUGMENTS[i].id===id) a=AUGMENTS[i];
- if(!a) return;
- AUG.taken[a.id]=(AUG.taken[a.id]||0)+1;
+ const a=AUG_BY_ID[id];
+ if(!a||AUG.taken[id]) return;
+ a.d=augDesc(a);
+ AUG.taken[id]=1;
  AUG.list.push(a);
- a.f();
+ applyAug(a);
  refreshBuffs();
  feed('증강 획득 · <b style="color:'+RARITY[a.r].c+'">'+a.n+'</b> — '+a.d,'good');
  E.veil.classList.add('hide');
@@ -2785,7 +3132,7 @@ function showMenu(resumable){
   '<button type="button" class="mapcard'+(G.chaosSel?'':' on')+'" data-mode="0" style="flex-direction:column">'+
    '<div class="nm">정규전</div><div class="sub">설계된 '+LAST_WAVE+'개 웨이브 · 방어탑 22종 · 완주하면 승리</div></button>'+
   '<button type="button" class="mapcard'+(G.chaosSel?' on':'')+'" data-mode="1" style="flex-direction:column">'+
-   '<div class="nm" style="color:#ff6bd6">아수라장</div><div class="sub">끝없는 웨이브 · 적이 계속 강해짐 · 3웨이브마다 <b style="color:#ff6bd6">증강</b> 선택</div></button>';
+   '<div class="nm" style="color:#ff6bd6">아수라장</div><div class="sub">끝없는 웨이브 · 적이 계속 강해짐 · 3웨이브마다 증강 <b style="color:#ff6bd6">300종</b> 중 택1</div></button>';
  E.sheet.innerHTML=
   '<h1>네온 코어 디펜스</h1>'+
   '<p class="tag">침공체는 단 하나의 회랑을 따라 코어로 밀려옵니다. 회랑 옆 빈 칸에 방어탑을 세우고, 강화하고, 사거리를 겹치세요. '+LAST_WAVE+'개 웨이브를 버티면 승리, 코어 내구도가 0이 되면 종료입니다.</p>'+
@@ -2858,7 +3205,7 @@ function startGame(endless){
  G.gold=G.D.gold+(G.chaos?220:0); G.lives=G.D.lives; G.maxLives=G.D.lives;
  G.score=0; G.wave=0; G.waveOn=false; G.waveT=0; G.repBank=0;
  G.queue=[]; G.enemies=[]; G.towers=[]; G.shots=[]; G.fx=[]; G.parts=[]; G.texts=[];
- G.pools=[]; G.mines=[];
+ G.pools=[]; G.mines=[]; G.rushT=0; G.pAcc=0; G.cShield=0; G.bossOn=false; G.corpseDepth=0;
  G.sel=null; G.buy=null; G.paused=false; G.endless=!!endless||G.chaos;
  G.killed=0; G.leaked=0; G.earned=0; G.dealt=0; G.tips=0; G.tab=0;
  G.prepMax=20; G.prep=20;
