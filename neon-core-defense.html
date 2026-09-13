@@ -1,6 +1,7 @@
 <title>네온 코어 디펜스</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -3009,6 +3010,7 @@ function startWave(){
  SND.play(boss?'bossin':'wave');
  SND.intensity=clamp(G.wave/22,0,1);
  feed('<b>웨이브 '+G.wave+'</b> 교전 개시'+(boss?' · 보스 등장':''),boss?'bad':'');
+ if(G.coop&&!G.coopSolo&&NET.host) NET.send({k:'wave',n:G.wave});
  syncUI();
 }
 function endWave(){
@@ -3045,7 +3047,6 @@ function endWave(){
  if(G.chaos&&G.wave%10===0) banner('생존 '+G.wave+' 웨이브','아수라장 돌파');
  G.prepMax=(G.chaos?14:12)+AUG.prepBonus; G.prep=G.prepMax;
  syncUI();
- if(G.coop&&!G.coopSolo&&NET.host) NET.send({k:'wave',n:G.wave+1});
  if(G.chaos&&(G.wave===1||(G.wave-1)%3===0)){ offerAugments(); return; }
 }
 function healCore(n){
@@ -3067,7 +3068,6 @@ function callWave(){
  if(G.coop&&!G.coopSolo&&!NET.host){ NET.send({k:'callwave'}); return; }
  G.prep=0;
  startWave();
- if(G.coop&&!G.coopSolo) NET.send({k:'wave',n:G.wave});
 }
 
 /* ═══════════ 건설 ═══════════ */
@@ -4573,24 +4573,96 @@ function syncDiffBadge(){
 
 /* ═══════════ 협동전 네트워크 ═══════════ */
 const ETYPE=Object.keys(ENEMIES), TIDS=Object.keys(TOWERS);
+/* ═══════════ 협동전 연결 ═══════════
+   두 가지 경로를 쓴다.
+   p2p  : PeerJS(WebRTC)로 두 브라우저를 직접 연결 — 서로 다른 컴퓨터, 로그인 불필요
+   room : Claude 아티팩트 런타임의 room 기능 — 같은 조직 계정끼리
+   둘 다 없으면 협동전은 혼자 양면 방어로만 동작한다.                      */
 const NET={
- api:null, tried:false, code:'', side:0, host:false, nick:'',
- peers:[], partner:null, lastSend:0, lastSeen:0, onLobby:null,
- async init(){
-  if(NET.tried) return NET.api;
-  NET.tried=true;
-  try{ NET.api=(window.claude&&window.claude.use)?await window.claude.use('room'):null; }
-  catch(e){ NET.api=null; }
-  if(NET.api){
-   NET.api.onPeers(function(ch){ NET.peers=ch.peers; NET.sync(); }, function(){ NET.api=null; });
-   NET.api.on('coop',NET.onMsg,function(){});
-  }
-  if(NET.onLobby) NET.onLobby();
-  return NET.api;
+ api:null, tried:false, initing:null,
+ peer:null, conn:null, mode:'', ready:false,
+ code:'', side:0, host:false, nick:'',
+ peers:[], partner:null, lastSend:0, lastSeen:0,
+ status:'', onLobby:null,
+
+ init(){
+  if(NET.initing) return NET.initing;
+  NET.initing=(async function(){
+   if(NET.tried) return NET.api;
+   NET.tried=true;
+   try{ NET.api=(window.claude&&window.claude.use)?await window.claude.use('room'):null; }
+   catch(e){ NET.api=null; }
+   if(NET.api){
+    NET.api.onPeers(function(ch){ NET.peers=ch.peers; NET.syncRoom(); },function(){ NET.api=null; });
+    NET.api.on('coop',function(m){ if(!m.isMe) NET.handle(m.data); },function(){});
+   }
+   NET.ui();
+   return NET.api;
+  })();
+  return NET.initing;
  },
- ok(){ return !!NET.api; },
- /* 같은 방 코드를 가진 상대만 찾는다 */
- sync(){
+ ok(){ return !!(NET.api||window.Peer); },
+ ui(){ if(NET.onLobby) NET.onLobby(); },
+ joined(){ return NET.mode==='p2p' ? !!(NET.conn&&NET.conn.open) : !!NET.partner; },
+
+ /* ── 방 열기 / 들어가기 ── */
+ async open(isHost,code){
+  await NET.init();
+  NET.close();
+  NET.code=code; NET.host=isHost; NET.side=isHost?0:1;
+  NET.nick=isHost?'P1':'P2';
+  NET.lastSeen=performance.now();
+  if(NET.api){ NET.mode='room'; NET.status=isHost?'상대를 기다리는 중':'방에 들어갔습니다';
+   NET.say({m:'ncd',room:code,side:NET.side,nick:NET.nick,st:'lobby'}); NET.ui(); return; }
+  if(window.Peer){ NET.openP2P(isHost,code); return; }
+  NET.status='연결 수단을 찾을 수 없습니다'; NET.ui();
+ },
+ openP2P(isHost,code){
+  NET.mode='p2p'; NET.status='연결 중…'; NET.ui();
+  let p;
+  try{ p=new window.Peer(isHost?('ncd7-'+code):undefined,{debug:0}); }
+  catch(e){ NET.status='연결에 실패했습니다'; NET.ui(); return; }
+  NET.peer=p;
+  p.on('open',function(){
+   NET.ready=true;
+   if(isHost){ NET.status='상대를 기다리는 중 · 코드를 알려주세요'; NET.ui(); }
+   else { NET.status='방을 찾는 중…'; NET.ui(); NET.bind(p.connect('ncd7-'+code,{serialization:'json'})); }
+  });
+  p.on('connection',function(c){ if(NET.host) NET.bind(c); });
+  p.on('error',function(e){
+   const t=(e&&e.type)||'';
+   if(t==='unavailable-id') NET.status='이미 사용 중인 방 코드입니다 · 다시 만들어 주세요';
+   else if(t==='peer-unavailable') NET.status='그 방을 찾을 수 없습니다 · 코드를 확인해 주세요';
+   else if(t==='browser-incompatible') NET.status='이 브라우저는 P2P 연결을 지원하지 않습니다';
+   else NET.status='연결 오류 · 잠시 후 다시 시도해 주세요';
+   NET.ui();
+  });
+ },
+ bind(c){
+  if(!c) return;
+  NET.conn=c;
+  c.on('open',function(){
+   NET.status='상대와 연결됐습니다';
+   NET.lastSeen=performance.now();
+   NET.say({m:'ncd',room:NET.code,side:NET.side,nick:NET.nick,st:G.scene});
+   NET.ui();
+  });
+  c.on('data',function(d){ NET.recv(d); });
+  c.on('close',function(){
+   NET.conn=null; NET.partner=null;
+   NET.status='상대 연결이 끊겼습니다'; NET.ui();
+  });
+  c.on('error',function(){});
+ },
+ close(){
+  try{ if(NET.conn) NET.conn.close(); }catch(e){}
+  try{ if(NET.peer) NET.peer.destroy(); }catch(e){}
+  NET.conn=null; NET.peer=null; NET.ready=false; NET.partner=null;
+ },
+
+ /* ── 같은 방 코드를 가진 상대 찾기 (room 전용) ── */
+ syncRoom(){
+  if(NET.mode!=='room') return;
   let found=null;
   for(let i=0;i<NET.peers.length;i++){
    const p=NET.peers[i], pr=p.presence||{};
@@ -4599,25 +4671,43 @@ const NET={
   }
   NET.partner=found;
   if(found) NET.lastSeen=performance.now();
-  if(NET.onLobby) NET.onLobby();
+  NET.ui();
  },
- say(patch){ if(NET.api) NET.api.presence(patch).catch(function(){}); },
+
+ /* ── 전송 ── */
+ say(patch){
+  if(NET.mode==='room'){ if(NET.api) NET.api.presence(patch).catch(function(){}); return; }
+  if(NET.conn&&NET.conn.open){
+   patch.k='st';
+   try{ NET.conn.send(patch); }catch(e){}
+  }
+ },
  send(obj){
-  if(!NET.api) return;
   obj.room=NET.code;
-  NET.api.emit('coop',obj).catch(function(){});
+  if(NET.mode==='room'){ if(NET.api) NET.api.emit('coop',obj).catch(function(){}); return; }
+  if(NET.conn&&NET.conn.open){ try{ NET.conn.send(obj); }catch(e){} }
  },
- onMsg(msg){
-  const d=msg&&msg.data;
+ recv(d){
+  if(!d||typeof d!=='object') return;
+  NET.lastSeen=performance.now();
+  if(d.k==='st'){ NET.partner={presence:d}; return; }
+  NET.handle(d);
+ },
+ handle(d){
   if(!d||d.room!==NET.code) return;
-  if(d.k==='start'&&!msg.isMe){ startCoop(1,d.seed); return; }
-  if(d.k==='wave'&&!msg.isMe){ if(G.scene==='play'&&!G.waveOn&&d.n===G.wave+1) startWave(); return; }
-  if(d.k==='callwave'&&NET.host&&G.scene==='play'&&!G.waveOn){ callWave(); return; }
-  if(d.k==='bye'&&!msg.isMe){ feed('<b>상대가 나갔습니다</b> · 남은 진영은 그대로 진행됩니다','bad'); NET.partner=null; }
+  if(d.k==='start'){ startCoop(NET.side,d.seed); return; }
+  if(d.k==='wave'){
+   if(G.scene==='play'&&!G.waveOn&&d.n>G.wave){ G.wave=d.n-1; G.prep=0; startWave(); }
+   return;
+  }
+  if(d.k==='callwave'){ if(NET.host&&G.scene==='play'&&!G.waveOn) callWave(); return; }
+  if(d.k==='bye'){ feed('<b>상대가 나갔습니다</b> · 남은 진영은 그대로 진행됩니다','bad'); NET.partner=null; }
  },
- /* 내 진영 상태를 절대값으로 계속 알린다 — 메시지가 유실돼도 다음 갱신이 바로잡는다 */
+
+ /* 내 진영 상태를 절대값으로 계속 알린다 — 유실돼도 다음 갱신이 바로잡는다 */
  push(force){
-  if(!NET.api||!NET.code) return;
+  if(!NET.code) return;
+  if(NET.mode==='p2p'&&!(NET.conn&&NET.conn.open)) return;
   const now=performance.now();
   if(!force&&now-NET.lastSend<130) return;
   NET.lastSend=now;
@@ -4675,7 +4765,7 @@ function coopLives(){
  return Math.max(0,G.maxLives-(G.myLeak|0)-other);
 }
 function startCoop(side,seed){
- NET.side=side; NET.host=(side===0); NET.lastSeen=performance.now();
+ NET.side=side; NET.lastSeen=performance.now();
  G.coopSel=true; G.chaosSel=false; G.duelSel=false;
  G.coopSolo=false; G.side=side;
  applyMap(findMap('twin')||MAPS[0]);
@@ -4893,19 +4983,24 @@ function takeAugment(id){
 }
 
 function coopLobbyHtml(){
- const p=NET.partner, pr=p?(p.presence||{}):null;
+ const on=NET.joined();
  let h='<div class="startrow" style="margin:0 0 10px">'+
   '<button class="btn" id="c-make" style="padding:11px 16px">방 만들기</button>'+
-  '<input id="c-code" class="codein" style="max-width:170px" placeholder="방 코드" value="'+(NET.code||'')+'" autocomplete="off">'+
-  '<button class="btn" id="c-join" style="padding:11px 16px">참가</button></div>';
+  '<input id="c-code" class="codein" style="max-width:150px" placeholder="방 코드" value="'+(NET.code||'')+'" autocomplete="off">'+
+  '<button class="btn" id="c-join" style="padding:11px 16px">참가</button>'+
+  (NET.code?'<button class="btn" id="c-leave" style="padding:11px 14px">나가기</button>':'')+'</div>';
  if(NET.code){
   h+='<div class="scores" style="margin:0">'+
-   '<div class="sc"><div class="k">방 코드</div><div class="v" style="color:var(--core)">'+NET.code+'</div></div>'+
+   '<div class="sc"><div class="k">방 코드</div><div class="v" style="color:var(--core);letter-spacing:.12em">'+NET.code+'</div></div>'+
    '<div class="sc"><div class="k">내 진영</div><div class="v">'+(NET.side===0?'왼쪽':'오른쪽')+'</div></div>'+
-   '<div class="sc"><div class="k">상대</div><div class="v" style="color:'+(pr?'#5ef2a4':'var(--dim)')+'">'+
-    (pr?'접속함':'대기 중')+'</div></div></div>';
-  if(NET.host) h+='<div class="startrow"><button class="big" id="c-start"'+(pr?'':' disabled')+'>협동전 시작</button></div>';
+   '<div class="sc"><div class="k">상대</div><div class="v" style="color:'+(on?'#5ef2a4':'var(--dim)')+'">'+
+    (on?'접속함':'대기 중')+'</div></div></div>';
+  if(NET.status) h+='<div class="best" style="margin-top:9px">'+NET.status+
+   (NET.mode==='p2p'?' <span style="color:var(--dim)">· 직접 연결</span>':'')+'</div>';
+  if(NET.host) h+='<div class="startrow"><button class="big" id="c-start"'+(on?'':' disabled')+'>협동전 시작</button></div>';
   else h+='<div class="best" style="margin-top:10px">방장이 시작하면 자동으로 함께 들어갑니다.</div>';
+ } else {
+  h+='<div class="best">방을 만들면 <b>코드</b>가 나옵니다. 그 코드를 지인에게 알려주고 이 링크를 함께 여세요 — 서로 다른 컴퓨터에서 바로 연결됩니다.</div>';
  }
  return h;
 }
@@ -4943,7 +5038,7 @@ function showMenu(resumable){
    '<div class="nm" style="color:#ffc247">협동전</div><div class="sub">회랑 둘 · 코어 하나 · 방을 만들어 둘이 각자 한 진영을 맡는다</div></button>';
  const coopHtml=G.coopSel?('<h3>협동전</h3>'+
   '<p class="tag" style="margin:0 0 10px">양쪽 진영에서 <b>똑같은 적</b>이 동시에 밀려옵니다. 회랑은 둘이지만 <b>코어는 하나</b>라, 어느 쪽이 뚫려도 같은 내구도가 깎입니다.</p>'+
-  (NET.ok()?coopLobbyHtml():'<div class="best">온라인 방은 Claude 아티팩트 링크에서만 열립니다.</div>')+
+  '<div id="c-lobby"></div>'+(NET.ok()?coopLobbyHtml():'<div class="best">이 브라우저에서는 온라인 연결을 쓸 수 없습니다.</div>')+
   '<div class="best" style="margin-top:10px">아래 <b>작전 개시</b>를 누르면 혼자서 양쪽 진영을 모두 방어합니다.</div>'):'';
  const duelHtml=G.duelSel?('<h3>친선전 설정</h3>'+
   '<p class="tag" style="margin:0 0 10px">한 컴퓨터에서 번갈아 하거나, 도전 코드를 보내 각자 플레이해도 됩니다. 지형·난이도·웨이브·증강 후보가 완전히 같습니다.</p>'+
@@ -5028,9 +5123,8 @@ function showMenu(resumable){
  if(rs) rs.addEventListener('click',function(){ E.veil.classList.add('hide'); togglePause(); });
  const cm=E.sheet.querySelector('#c-make');
  if(cm) cm.addEventListener('click',function(){
-  NET.code=Math.random().toString(36).slice(2,6).toUpperCase();
-  NET.side=0; NET.host=true; NET.nick='P1';
-  NET.say({m:'ncd',room:NET.code,side:0,nick:'P1',st:'lobby'});
+  const code=Math.random().toString(36).slice(2,6).toUpperCase();
+  NET.open(true,code);
   showMenu(resumable);
  });
  const cj=E.sheet.querySelector('#c-join');
@@ -5038,8 +5132,12 @@ function showMenu(resumable){
   const el=E.sheet.querySelector('#c-code');
   const v=el?el.value.trim().toUpperCase():'';
   if(!v) return;
-  NET.code=v; NET.side=1; NET.host=false; NET.nick='P2';
-  NET.say({m:'ncd',room:NET.code,side:1,nick:'P2',st:'lobby'});
+  NET.open(false,v);
+  showMenu(resumable);
+ });
+ const cl=E.sheet.querySelector('#c-leave');
+ if(cl) cl.addEventListener('click',function(){
+  NET.send({k:'bye'}); NET.close(); NET.code=''; NET.status='';
   showMenu(resumable);
  });
  const cs=E.sheet.querySelector('#c-start');
@@ -5275,7 +5373,12 @@ function boot(){
  window.addEventListener('blur',function(){ if(G.scene==='play'&&!G.paused) togglePause(); });
 
  NET.init();
- NET.onLobby=function(){ if(G.scene!=='play'&&G.coopSel&&!E.veil.classList.contains('hide')) showMenu(false); };
+ NET.onLobby=function(){
+  if(G.scene==='play'||!G.coopSel) return;
+  if(E.veil.classList.contains('hide')) return;
+  const box=E.sheet.querySelector('#c-lobby');
+  if(box) showMenu(false);
+ };
  showMenu(false);
  syncUI();
  requestAnimationFrame(loop);
