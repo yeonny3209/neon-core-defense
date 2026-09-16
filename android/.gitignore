@@ -1,0 +1,8 @@
+build/
+.gradle/
+local.properties
+.idea/
+*.iml
+captures/
+# 게임 HTML 은 저장소 루트의 index.html 을 빌드할 때 복사해 넣는다 (중복 보관 안 함)
+app/src/main/assets/
