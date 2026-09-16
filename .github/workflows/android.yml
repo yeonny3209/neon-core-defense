@@ -79,11 +79,11 @@ jobs:
             cp "$AAB" neon-core-defense.aab
             FILES="$FILES neon-core-defense.aab"
           fi
+          printf '%s\n\n%s\n\n%s\n' \
+            "**neon-core-defense.apk** — 휴대폰에서 이 파일을 내려받아 바로 설치하세요. 설치할 때 '알 수 없는 앱 설치 허용'을 켜야 합니다." \
+            "**neon-core-defense.aab** — 나중에 플레이 스토어에 올릴 때 쓰는 파일입니다. 제출하려면 서명이 더 필요합니다." \
+            "플레이 스토어 심사를 거치지 않은 직접 설치용 파일입니다." > notes.md
           gh release delete android-latest --yes --cleanup-tag || true
           gh release create android-latest $FILES \
             --title "네온 코어 디펜스 - 안드로이드 (최신)" \
-            --notes "**neon-core-defense.apk** — 휴대폰에서 이 파일을 내려받아 바로 설치하세요. 설치할 때 '알 수 없는 앱 설치 허용'을 켜야 합니다.
-
-**neon-core-defense.aab** — 나중에 플레이 스토어에 올릴 때 쓰는 파일입니다. 아직 서명 전이라 스토어 제출에는 서명이 더 필요합니다.
-
-플레이 스토어 심사를 거치지 않은 직접 설치용 파일입니다."
+            --notes-file notes.md
