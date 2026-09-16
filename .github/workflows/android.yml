@@ -34,6 +34,10 @@ jobs:
 
       - name: 안드로이드 SDK 준비
         uses: android-actions/setup-android@v3
+        with:
+          # 기본값인 'tools' 패키지는 폐기되어 더 이상 받을 수 없다.
+          # 필요한 platform/build-tools 는 Gradle 이 알아서 받는다.
+          packages: ''
 
       - name: Gradle 준비
         uses: gradle/actions/setup-gradle@v4
