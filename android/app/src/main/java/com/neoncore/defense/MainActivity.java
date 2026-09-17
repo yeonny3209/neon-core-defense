@@ -99,13 +99,22 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (web != null) web.onPause();
+        if (web != null) {
+            // 웹뷰의 visibilitychange 는 믿을 수 없어, 액티비티가 멈출 때 오디오를 직접 끈다
+            web.evaluateJavascript("window.NCD_pause&&window.NCD_pause();", null);
+            web.onPause();
+            web.pauseTimers();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (web != null) web.onResume();
+        if (web != null) {
+            web.onResume();
+            web.resumeTimers();
+            web.evaluateJavascript("window.NCD_resume&&window.NCD_resume();", null);
+        }
     }
 
     @Override

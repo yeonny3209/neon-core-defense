@@ -1915,6 +1915,12 @@ const SND={
     확실히 소리가 끊기게 한다 — 배경음악 볼륨만 줄이면 브라우저에 따라 계속 들릴 수 있다. */
  pauseAll(){ if(this.ctx&&this.ctx.state==='running') this.ctx.suspend().catch(()=>{}); },
  resumeAll(){ if(this.ctx&&this.ctx.state==='suspended') this.ctx.resume().catch(()=>{}); },
+ /* 탭/창을 완전히 닫을 때 — suspend 로는 부족할 수 있어 오디오 하드웨어 연결을 아예 반납한다 */
+ hardStop(){
+  if(this.musicSrc){ try{ this.musicSrc.stop(); }catch(e){} }
+  if(this.ctx){ try{ this.ctx.close(); }catch(e){} }
+  this.ctx=null; this.ready=false; this.musicSrc=null;
+ },
  pump(){
   if(!this.ready||!this.musicFilter) return;
   /* 강도는 천천히 따라간다 — 갑자기 음색이 튀지 않게 */
@@ -5993,6 +5999,13 @@ function boot(){
   if(document.hidden){ if(G.scene==='play'&&!G.paused) togglePause(); else SND.pauseAll(); }
   else SND.resumeAll();
  });
+ /* 탭/창을 아예 닫거나 벗어날 때 — 뒤로가기 캐시(persisted)에 들어가는 경우가 아니면 오디오를 완전히 닫는다 */
+ window.addEventListener('pagehide',function(ev){
+  if(ev.persisted) SND.pauseAll(); else SND.hardStop();
+ });
+ /* 안드로이드 앱(WebView)이 액티비티 onPause/onResume 때 직접 부를 수 있는 고정된 진입점 */
+ window.NCD_pause=function(){ if(G.scene==='play'&&!G.paused) togglePause(); SND.pauseAll(); };
+ window.NCD_resume=function(){ SND.resumeAll(); };
 
  const tgo=$('#t-go');
  if(tgo) tgo.addEventListener('click',function(){
