@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="네온 코어 디펜스 - 방어탑 52종, 증강 1200종, 온라인 협동전">
+<meta name="description" content="네온 코어 디펜스 - 방어탑 52종, 증강 1250종, 온라인 협동전">
 </head>
 <body>
 <title>네온 코어 디펜스</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
+/* Orbitron 가변 폰트를 파일에 직접 심는다 — 인터넷이 없어도 글씨가 똑같이 나온다.
+   한글은 기기에 이미 있는 시스템 글꼴을 쓴다 (안드로이드·윈도우 모두 내장). */
+@font-face{font-family:'Orbitron';font-style:normal;font-weight:400 900;font-display:block;
+ src:url(data:font/woff2;base64,d09GMgABAAAAAC4YABQAAAAAZxAAAC2oAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGoF/G5sKHCg/SFZBUoRnBmA/U1RBVHQnJgCEWC9gEQgK0jy+JguCeAAwuiIBNgIkA4VsBCAFh0AHg2MMBxspWhNuDDdsHMAGuPNAoqhXg1Nq8l8nb4V0G9TP0uik5WxD3d21rSq5wyIVzIqHd0LQ4BUSba/YM938WMuCEfa80/V+8qDvzpMNs/SFxNI3Fh+hsU9yDSI3mz3gRFRAgyYqGsBYgyUKWJJXBNI0Fg4VkxgExQKi+EpMaaaUpqZ03wRTPr2bN6aWrzX/fkvh4dd6fuf+Zmd2X3uCsVm6iIjFZsjdIOyPc70Pkoaa0vEHhk0BOtJT7mBTGsiNhSYGnr4/+J299zVB+Clq+tB4APQIQ4o4oPbnaVv/ZxiYGSpURlQGQTcSc7dxa3z4q4Pr7P6odN/7vqhv4Waru2wAJhZDS6QOw/8jN/68wKStNIa2iL/pv378zeN3CYZxERVGHvik0v8b08amsfynNfO9mczl+v/MTq6AqFph6ji7c8keFRBlUgZhWg/kAB0IR8LV9f9MTds/mFtpeZRt4pJC5JPgkOnQi+eYispPrV+/OzOLxcxgAXDJM4FdgvH0BBz4dMDi+O4InmwsqADA8SgHhRDolBFoPfKiQkqdU5Vjl0LtouncuXPf2cYqdcBrc2pdgkaJzbf13f77fCdhcJY701VSCWKDTUVuxW7y5q92P8bUijPZXb5xImGecgKhvu18IGDBz8v/ameh4IfAAwQ8eIHAB74I/AUiCBWOIEoUghgxCOQSECh8hEAtE4HWcASj5CMoVILAwoLAqhqBgxPBPp1YOOggFgiARhQAMUCIAgEB0GyzPAABrv1O+h4+8gemZxZCiyvhSDQWT6TW0plsLl8olsqV9Q2hKpLZHNqDy/PiC/w+TTV0fZPVZnds3r6jrXv/wR6tblg+YygyjrVWVIGAAGpqIAB4iKBG6b6NKgDf8d1VBz7YAPDhgwRAQNX8bKiDqLv6PAoLysUUOYoGO/Hzc0FIW0gQMoc3ssY/EHcv6ml4i3pfvt/QD2/9Ky/3vr93N7p85LP7HtaBtzZbh0WKUneCQIG+874P4/bf5vtm88LU3uejFyGjUzNqNCZ1HwyAoAY6YOzyrVKJUxfB1uzBq/DmwOrlqO0ky/AJtN2lIPz0wsAe2BPzcR8cjMU4BMuwHMfhJJyC1ThTDjuPWr83DgH87hBs7OPW6SAKXBBcWxcdQPk28TE9RU/MI7wf32fvEt11J9wRSv5HPs/P0bP9LDi6E7O/2ev2rJ24B1ybL8cVsH5bLSt/gfPNaCZqRL2m05tmHa11tayC8mHOy37xU8yJpkgMb7zX6wsESgSe4MEbPvDTh78gwcRChJKIFC3GQHKDJEqioJIsg5qG1ggjZcmmxzAoUMjIpJSZRTkrG7uabuxopgXWYsEAPLHyA2xPCPs1goHAi0NgS7QBhF+gkdzwGkNbGJAFvEqG4qtA+QWcYxcNL2O7yFJQFz93adGTAV4oA15xYenIZTy4adatZgZpkdLOnNptPnl1soLnU3wkS+cqNenTHS8ARgLKZIHnLdlAhsV+UQgoYSx+5TO7AkUspXVxOdD1rNngaEuvAXg0A+BDUarF/QERsEiNd5TC2NKazlK429mSrQFeM/jKaFp1o979Ew2eZ294WkwfUSE2GAksGUQKuGBGKMQxSyMLUzlxp546WijtGtRMLBrODGttRRS4tA+SgZsoA4dqoyHSkNWGpZKNw52ugLhZrNzMgsvBpu9IB0sn5GR4vaAu0Stc2xPqV2Vf1KhgtyksMmtsBO5k1uIzgE3YfdpjB9cVnN4jSJ7w9dXh8VUQXF4OqKOVcoSGR8qsSGYnsUEWctDYOrZIK4I2kE5OTS6OmVNSQzVg5Cmh5CeewFp4XcSGRuCZJZsAQfTgsYwFz+M5IOCCN5JbuMQywOM0Q/HqUFh6/hsOyCUZOjrivV+RLtJFtpqtrC3f3qwsNehbLYw8U1xk2IX3idvrfaP7e+iMzDoYS4ucqUL91xApDYYlokjJGyqZ70X/wv7AXqcLgjbIwpSlUwDSGzoVBUhnLzwEFDUDwGbMQV5C2OByk0vgosGhcJo6PesIoFfIdgcwyFRBBchCIKOwd1xFXZuuqWbvwhQz4do587JrG1QGlOUC6gjH4ghIohPqruPX4kJGUV42koHzdubbzEN6QAtr8g72kdxZm6lLB0MDnNO0wPnCiO6blgkAWRpmuEGIpjPrs4oPC1uidMI8ZvZaAM3KS3TuWjeZSB25J1ycJi6Q6VjGR3gw1uCPcAbWWmkNOBxOqDeV9UMRHmeJ7CT3oWB6GjSxch5tagQQHwknX4Ekg6UmTbJ1ODEY1TGAfeZ2czB20qGYYN+niXAW0q/sZMCF0sg3rBwHOlY8AFPqkw4YTkghfAbSbrsvux9DFzgL6cWiwe+PMWalR5lbd4slg8y0Kn//Fr3PpWIOh+YC3C+DXLsLAfsVzdfjwJ41H+Oa2CXNn2nmDX9gp7XjlsiIsNr49vBMpbMF0+8tuSXMxMsNIv9Ly4QsTrhAaFMoTNKWM2lohO5LVnnDbAA5OyDCWmAdBwiKUNBMPjIa1kw9EzBSsvoKLMlwxDCzS/EluJ9rpERdN9TQ6ENZDVyGSnJpRZyGKaA/XKBfhPtgGY7GYsxH0mIKihYKA5SLwEXMl5Abktx/0tH2Y+myS0hhlO1N/Z2OpZ9KZM1zgaF2clCEdXgYSt0RC54fZnO7ZKC6aS/tPEE+rMgiaaQaTvNZ9MwC6rDsCjljYekdf9Z0DkAK9pU0MAsJsx4gH6aNQUnnH6iYxrMfLSBRNlDpjC2mnSU/OcD/AkCAU5BSsEdMpUbsB1QElbKG2tEwdko6Sz/0dMP/KoW9FyRydJqcsz+LAOReZDbwCJyDRrVmI7SJ+EFiw/G+53a01ckjF1EYNFXxKbtA34L2BDxyWlCPk9DI9jYEQYABF0gDnN4OrkQHiRokNcBFDcShke46TvZSSAZSP2Y6cfZekNb+QHxfEEVfGz4MQESAhAsckA+LIoi6RFI8U8MIJIhDusDAtlCM5HtqWiIYcN1AwD9NI5mRxIXSKLFJlgKbpYWRzS1ih6zJcIEhVZBKsNrTp0hhizgQlYJ6LQyqTqJo3FC5gXgAHMVFmJyHBAEgEyMsQek7phDSJSKShvABxKlIDhw6qXyQ5WujRCJAQtUVQDZgBMC7GQC/CwRagBgLgzpJRNEQkSyACBB8gUJiFY1lthaEmFdjSoTiBzCvyDDylrXMkB1uX6fUYQqsZ7X6wV2zpVco5kMAId+Fm4vS/AH66idw9b4l/UlIyYQZIFyESFGr+Oax4sRLWMmlMrRPkSrNYEN8JH1Fl5lhc52hhhm+rH/2UXLkypO/tu+piFGx0cYYq8S4JV6Whc0rVKpSvc5/e9eq41TvYw0auYzXZIKJJplsiqmmmW6GZjPNMtscc80z3wILLbLYEksts9wKK62y2hprrbPeBhu1aNVmk8222Gqb7XbYaZfd9mj3iQ57r5seiv0OOOiQTx12xFHHHHfCSQTAbQSA9zmcWC9fbxpHSMHfq4c5nA9Eey2/OLzPt+0pPG8gwPcBPavOESP6Bbe1QXcAeOHN8Kvuih/ylD87sHM2tTVW4ADUoiwGZMfzE5PElKCXboYqgAb57xQa4jzJ04C/eQPg9i3qDYAAAKXLHoAEBQICLggAERqAGDXhV7WLAIA3xKIoqI3CAkARQlYAdRpAAIBQ5E+5L4sqrmbn7cthSdbQrDl5IPA4ryLs0Puzr2MCWz5PfVXKxe3tXd9t/qsDFAAWABGWy695NqUDaKhxQCFeqnGm26HdAYcdddxtj7zwq7+984FMhiGv5tN8XoTFYnElXxiaaWSamVbm+aefKAKJBGlKbdVuP5u2zrnjiVd+9+9FYTDe/pMxMw30kQIDvkcvAORDFoX36/TBWQu8+xNmhRnhBeFFYWBhavg3uGnBslA8/8vczxFoACY7fQH4BgAAX4QifBIQqtAAQIYhO9pghnXmarNbu/UrLzvHZlOiO9m8FSp3ri0N9fb8719fVL6nqPLLf4n5llrp8C8BD9Uiey22y0bNWm1yQodZOKDAggfYoMGFF3y9pBXoHd3+BnhEHp7SWyV4wZxSmcG+L/iRNC2mMw33eVa+p3OLjPVuvCSlt6n2Z6laAiiCY+QPPop6KYiHK+SLInQSBNnkYZUGwLmHnbRA4eEgVoDCQ6EDivVUdjCw6fN/7P+JAQAvCcDDAF4RXQLwt4nNAP4DAAbm/zuFRLIaZ7PED1+TWfoYdKKjtCA4F+S3mmGObMD4Jailqz81u2fnSUvLppQxbVKMNHX6YQ6anfhJEMC+BjZuqeOOMeKR6NOcNFzLmS5XcPkkKYZJaGeHYngceElaSkZJcIrIcD8vmZKOuqwbopqUjbVSnJRt1pIUpHSZq0WtuUJSTl1ci5NoeTwbfi3aXEGpzvlLoZjd7qNJadqV7U73iR2f6Fv6WqtU1RGltjZjmmXnO7iFZlTsvHVTvOySXaNDVCHlrSf8kM9ZOSy5PLC1JBYucL0LPXS+ou5c+5lD+6i12MxIGe25RHxLIJU9mg0BPgI8IrKlp1k6j4u0N8XZcKg7h7PVB2QptFOSnJezsmzyaOtsYqeGqPdRxiIzkdOI9ZliIfW5KYRZtwyrsPynJKSifF1hYFmsTk20qqGuZYU6TcVQfRi+tNEtio2bwNssR/LMlG7asj3mNm6u6I5Dbq7DlefPLrgxzA9gveOEnO2nhg6+1DXG+tRGJngh4/dJj01tgD+hT2+zk7/92YyIEXbktlWg84zwmuvXCqYr9YHbddsO3Vq1e/s/F94qfT1KbtlMbZRG9TS7A+1mOBtvNEoeyRhxMCLn3g0Znh4hqc86sT7QywxvuFN2CaQ94OZQwPFeckM3tcT1rComOL2zyz0bHe/Wt38X4zGplbddMWqHJyVlPsTjXN18NnWPlEI63Nk1ORltQ0/v1HpR6m3mUS54jaw5Ryt9c0VrqM6MTXSLnuiarKrRZNiBQozIlmVSIUocsGlBfDUdlXn6FWUmnBUMaoUa6FyEyZy19B7cQHg0qq4ynQtlXrsLpvod8PjmjApaEb30sSm7PzES+nQ6T6TnZzvGdzRrbqJlgDV0FNna9jtdTsOo9GJpUCE1Mgm1++Wbtog+lOsH74HOatlU86R2N7Yp6pjwM6JX4iRkdY1sDDCzbymcgjFfv5cHMsQl65K2LQ0HPgcfFI5HTDBONgK+uqTHOwvk4pPvTM0uepYahWAzgxWzErOBzHpx1hw7BChX6GTg+8Q5BfVzcbf+jSX4gnkuHtMSkbNXl/GlPvPz6t6MFtiK37RgfTREL5kr52SvympNd6Phjv5vsbQ+q7BmRXpW2cKcRsZdM0LHMBWZbjJ9SnW1XE6e7Sj6ytZaQ9Y2OQspWaT6zDkVKa8XF8ok1DKo9bBSIfmSfD0xJI+SO0YIx8dQt+UubgSqMLJZaKHBYZBqHmYx51iGy0h1bvUcx3MwFTzmLJWCnrjOgFTMlHRCD6kv4LQsBnIop5wr386A19Eaa+ryWfB3BfqFXGhNBiEjAvpV5ie4J02Yn+brbCYOB5QureejUagFgvYzX4pRpQEu+6zdutaWMtEVg74MHcH2wXTJ0puYlpsaxxTKH5JM6WSSnEljwTjjI3YVw8PF/kO358NohxgQSjS/QbkiYicsz9+wnutQznA9N8C8bkPL+oGWSvZx2/zObQOHpdh4ZARXafMBDZgma6jnHLIhAVj71D0BAysGpXqeskZ9di4iSwqHYdFMGM3LbyKxtVxuGLHPySZQ9OCP1+tGVI49RaB91rRYEStmc+gbPU5frWgpF9tmmQS5nFXtwIzw3w7rY6H5iqT1ZC7F0ddKdrpT1bZMCllx5UG32xdpubbXD3K/sBhTyLrPhaeldIHuo9fowu1bfU6hfecepBVLe53S11Jnr7RY7xHnoc83xkFYKXzdJgAdfZpt0Kt/uc3c/kWtX7n2QcXInME9qeNLNvLtY/NLA9tHOMUT8q+yvR+tFgqGXRAWCTc2DajSqcSBkeI1RbpIX9RbU8cgrae4Vb5iVP6lG+IrZSl7YGVMaKpyGiH6kNEe4aFDDIt9ziC1R59RUkwPI5LQ9Bw2po5bnapPTRfri3tra42+80qvJvLK2EpiU4t9l4HUO/rmGXqk9DhjyuszOXv0rhHzhOvhhKDRpa9sg06Bjp86lrvbZ97THNms77toyu1iqfkv6T3pX2aph3fEOFpVIbynyx/zCswbMKMoxqQ/yvdLsuGHvvYfA0gXW7F3mrRYL34M2zRJRsltPI53jwVRgBlqfY8+YwY6MVWnGNhr/xqXsfV2aX2zs7l0y21Eg3O76G7mncyyU7Ins7iTHP6qsm5AHEis4Quq/4v6N6paQ1zEFrV7Q9RAkHV+XEBpn9LSm1eAJDgbBdCTy5JwS8209O7bZl2l8AHzQNYp6Hqgn72no5tAZ4z3dkfvpPvN0ZQLhj4SMsPsr/6p9AlLohcqUMzZOSy9jJQ2S8fqOyQzgDfJkSbsu6y+z9yf8pB5iJWyrs1ls88y1AOGlqXlxC6RSQzv6HkwIkuAraDEQlmvUzZ5s6H/M///gdVfwWC/b1Mzm0WyV6paPi+zbKyKU7kK6S6mS/JGXVBAx+j0+8EUG5p6AU7+AcNflgZnDGdktFlGNe7IYCBTNDy29ct/HISWcCSkRg1sLQMcXMgsLCljyqCC7r0UhV36LmGT8HdvdxmeJ/6okQH1HorgU980VP0SI0Xcc+hVpb21xfO2LYPBZM6qkG9Ufo2Yh+Q853wTmVxuFH6Nb2bzPs8HMfeTS0eBrgncYcwwNcQnhzSX4Q4So6vksTVaC32htwHLiGJZpKJIRq2+FovTbTuiHj+Mdo9MTWGmXJHbnjK8hlr41xwtRGjhQubs/8z/k7rJ+8z9VMGEumLT5xciQ2sWvKlPllmthQe+1Bbv339yv+Nq547O0U+1wx+9vPUScSC/h/8eTBynnp1+VkN+D/4jnDhOf3vqW6z5GkvYkb7B3FBCU6JT6JlQof7PmXkmr2LjkGjyhTb6J7bshSLZr8V6UPFZtyVaEXmNLIZncNXNqTn9ur4HqeATOHWyPtFwRMyImeBP9Dd8LcZNDPbDlhYahP3lnvnmRwRfH9EVJ8gQZJ3tr8jMvbL1fHvW/OigPWxuDN7iZG/JjydLrtQz9SdfemFpkcjpECaEIerImuY/MphicrWwapyTOmlZBwPWX7yUzX5t8FGxFUOwWzAskHua931hJXgwHvoyUSNqpN+qQ/TP3bv/ilbP9QHeubY90Y5rDCIYVUeQjhI2W0LigTvoK9EED4lWiq9NkXbLaKDwS3s2BLCE0vRDtXZbKmfhAVMWnJMJ5b8Ppb7yTiS22X1dGRnhGJiaf6W9aavUm+AwHP1NNrSenAODbQlsuI4YGe2U+gkrhRfbOKeADTHQRdrixuivjxRLFBcXNea+k3QCk/AvpZxkQc9OnvQJ3qsTi/1DxIEhIf7ikECsSoMmbvS0FXF9c1cltDAbV8QH5a6MGz01M37MZORB2VHBzBj2bDdzPnmHPmUHp5I0M5P6eVuYE4oOxhJh02jeW7C6DdmgYf9jXFX17+PgnqnXUU6/sbLA5H0ho83SEMPsoxfHCWFCkAJG/CgnNoil9Qger5fiXHqJHT+Zv9tJN2WvQWPQdYyGJBGSakPbkIkCfY0YZcPOp6XPtxsmAxXurFtw5Dqm/43RyrWGdXeQ9h7MPAbKd2BGf0d3QA+PW8T9hbLgXH3Tg7IcMj1Q/o8HhuYNbTQeMLkDSW8PrA8n3gdaLGGW/PytH2l1G7S1lNbaGFuVzWCrsJql3hjeCCuFFe2G9qp2pr3Wlb5h3iC0AY1zFy1QsvO585n5bw1vOzaYt40PL8/tmLvy54H1YzR0vdJHun7pepkv3tXINN6QzqDhpQ8WVglv/NxZV0+3pxrE1DqL/9dXnoEbEFQKtwqbBDcQCcb2u42xXZBuWrzUHCATGARXHt9u4QUzY/69h0F7OVo3MBs2MhvbmLZW8K6dCcb1V1qvhzmql9uW2xUbr62/WmRX2qAPvqaJp4zonc3jX0vSTGA4DPtaJQ9ulGYcr41KV35jwToBVn5rUbQxg6g/wzR0O2UxkVXh7WFRw2XDw4Ik8dHy/lgIR9eYEzVXiwSTjCoKROYmtUJWIM27hccAiRhK274KZ0ehVJRiiBeudktLT+MRPGZapwyZ9rpW3xUvGJte8XHxqpYvfGDW5H534LTiCwHTmd/3PgoYE7tIaUXotFaxONeWbJCt8FZcz8VcejGze27uiAWj/nkT8ZX+a1658x0ghkcb8DkECSJ0dUv/bmbqYQSLBDPNCeIEhu4vcBUWiRdh9wqVB0oWyWAJqy2gbMAZ5gwGzQgkgvctAYn2yhbppYsQd0B5eU2bkL8gD/zTND21enA1gtcEvA9QBSslLrimYQ9lD4GBxqjdrdTJNXJlRGZaTNDSIzBImTkEdYsiWvLCW1A0DYyOaQ6gIhAAHujcdkvu3nz/ttXu02vd6H1AOYh4WRqHIFo+NfAyxQcvVXx8bLkZ+795p9o3389Ruw+WG1aoG7zakjjAmxUJ3qRIfFzrZuVgrdyot7y3vLfcUjBeZSUj6AQl2apjCr9e66beB5SDUXW3A5+iHRgLDNYYUPh1y01ylM1g5328GfZf1fs06YZV6AKPsYyVg6PfqmK0ihMUfr3WTcpBy2rkjgMwWCWg8OuWmyxHabUesI/Fnb5Pu3U0ycZIPuPggccRPOjmQ+WBQ/+LgIzHlfU75Jz/r1ez/pHzAACA/j/SgMVjrWfl03omTbnQs1tKv7o01eOA6sqhpHwaNxGkJ3AAeW8e8A2rL9+BPyC6A22QUsDisrqpsJpmrVc+rWPiE5qLJNyDQHEwNbu8lkXOlXfJUuKFNZL61ZmVOhWeUl7LIvXdMMGQBDqp40O2+6uNfFen/zZ3RQJaCKlWzS3NU8rTCreq18NBNSWfQyxeFjmYd+nYmNbPROjIWo/mqANU2p54Wj7NOiU3RyH+50W2BFd3G8nsCVdpxPerdhEiAAgIQJY4BQBZBvBCBLkkqTIMla1ai0+d8MBXfvC7v72LF1GENrJDH8VhCmtMieWxMTriRJyLL+P7+C16421SVHgOTWeuzVv5OH/ON/lfgUWzfCusUmtk5ZWpmmpqza6FtbzWVmtdrS/r/ybs0M7oYZ3TBT22P+6Nva9P9IW+1t19v5/2j/1Blk7MDBntVE3tuGbyNM+8OTYP5rUMwcEi8Sni+8Tvgr8FA8HzwVBwkfAREVKqnMpIB/k68j0kp86q+2SJ6qR2UV+k/qkH9Zi+Rj2hVqkM9U/eJj8if4v8M/LfmX+ZF8x1+YxcWFgstt9O2xW7TlZIkt1yHlfxGE/xDG/xTv6qaEOPa5tv8BN+zR/1p/7y8A1/W/nusTx5dUXdrN6p3qs+pn6z+uvqn/k/+n/6Z/yLfsSf81fqs952gQcDaifAFBDSG5NJYoobFWjMRh4wYr08CAIZueaolqUiDLmHhqbtbg+2XEK6tAyh7TPDwzOFIBmCvackkl2qClhjr3riAJiROKKXgj+Ixate3nIObsO5kdeMjMy2vEYTPisMt0z3QQgCHHDaGjH3xkugbZFvMlUVruCYqQzV0+KSffqjKnDb58bG5uS1RJbScqG4LiiNaaGgr88BgQA4SAh1sABblgJqMVEcUfkGRB475oYmUqeQbJS3HC/1m2E67OyZ48f76p88gH4BaxThjaFYEbxsQKa41CxQpvmpp5AKTAJyxw7QuIFESEqrgtpa+xrKIyA4SeAHlSsFThngPg/ulwHsdku1IKbPiOzhRAuFIjww4+nc+DbCiksenGpZLqE4ynOCfyF9fY65zQ0UgAYLuYeEoc0eaEHY9BsiPzP47qzDwf1QIzCnnQV59RyxWYJ8GSgue+RRuGQyC2hKQk1luROpSbl8lqLOp9xurh9raUGSO9CJsOnpk0MDCsCSp/qx3zCaA3Sp3Fm5nMsNHqiMXgB6uCOiU+wWP7fgyFRSkziHhpBkckjWBb/jXHkWyWHrurwRar9VkBuBlCAjtmynDORK+DipnQ82D+QMkgBVyCCiK6+zZdZ5jUd/oqvPPElIwJ7O9JCckpDsW+VszK1Ja6Qtx5aFAh9a2LZNxjgqYwFtbrkOVu0skFy+fLYKOViuEPkZWx9AA9udYg3IVFm2jys4H3FLQb7L8UhCoQ4haQZHT9HJgEMwUqmpKXVYlfi217bOjY7OqQJ27eEKnnjrWKdS/hUmPJ5qOYrI42LT04vF5RLyTpMRW1qa5D6G0GcLvrSBIIIWfBiGoQtqu6yBKNs6MuEMKJadVEFhYahL32qYctg5Dr72g46ApaHi9fSyfuZ/udzVinM+5oLfo6bJAbEa9aJ52D0HH1LsJR4olfMKxSXpXg5JOuAuggNIchc6EVw5qUUSzM3S6El79c4mh4NDUE1w7D0JLgKmWwB1l1jHueA3p5Bk9/Awkkw5I9QPhG5RgHX5fyRXJmB0dG5VEJhR1qMgy44FLyR5do2JUVZHiNQC4gHElL0sG6R1hDgyMiv+46VbA1H0j1hHTvSIzlok+cMN0SOVqzHSlFP8jIMFdo3R9Qa9C5FvzkSL/hbViF0pCkJxxWqPra0s268q82YSWJahrmHAMG0yQWgqQIosV5lVIaQOXwaKuVkglPMQ4BgADFIKdf1KojRaZaz5+2VY1oMbzHy5X5FYq9OTE4WBTkD4g3dWBSEnLHSPyAyySX6mI0Ht8oXA1XBDb/FlV6E25SwWnYFvMNcVVbEzrJ21eeR8ogRjY/PgBRgudi0XEzCG8gJiXPLj/BjdryUr4ZIoJsLM/MfaXbCqClD640BU5uuQ5mCwjT5RNyyoKnalIPw5mgdZ2XKCQpVCcISdygJb04+NFSClkpwddx0ImaAbVwGzCPlUlQGrmmyfhfjU0X12O4zFuMZ1FcvmH0ul0zLZtfxrhuMwhwNd96D9KTMzoF+nFZZbsCqT0Ntr67Aj9RiMYVEIWO9DJJUpRnZZdWfPPvz58Kr6+vWE9QRS6E6+lTEGZEZyg5VipiCftkrBFwtreNtG8ITjtFBctcjwFUKfK5zETg77h1os4NKGIEDsQ8rKzIqxX08a6X++5NxhmzHXeBQ5ip2VbT0snc/JsY1mPsJIjCXLEV5me+WuaprIIAk8EUBhEox6I4YZtsIjjE3JipFhNYRXiAKBIx9WhzW+SQc45aapTVFKmleLVc6cQaZaXPWox2LHo5b4zMxSji+jqMz7RMkKDkej6guUH+wbbG3YpPuPUSJb1poo2jcdTsQLLx/FK7783dOn7+Y7ZVgPFqn0F6vFFB/LbYBYWxenaDoTGh8PcbFq4qSxiAWmQgFrXy21b/EQZDkJXnzPHlGTZQIoMzciFFehPYk6YclB+rERMKiC2LQ28eWqgqYU1H8R8vUPmiOs8uVAw1Iqd908efdvK6ve3DZIojTGIfieP+WUk0DgcTMn7iOICZnsCu50XU6YhI6uSXAq16FpXeTtl8HKfN0oIlnmTEiR+r3v7QKDihcMdtTWhl9FjNZH4mnVCBMEF/xe5HE1yQ6v16d9LMsZ+rYDVDFSnKdytC+4Ep+9hkEf3QO/hF8Sd8+eLpr9NrlEE87sZlkOyVQtzSuxEidLsZXmBlW/fyOead/W33/pSyPpe7NcsB0FUBkyH4At73jH3hSX2IhNTkIndm7uTCsVlLsCRX19VVEVvCSQ4jbui8d92nrjNfJ6m61ik9dwmS+LIp8JBCAmwolTdtlgSvO7fzd57RMzCSdOWO8MDNyJTw0OTllPII3B7I+slf1yhXjMu+LzMKTZxXOy+qSpqViA+K5lPpXJ5deJAFPH1gFo9bP7dy1PgQ/WoAd+JXqJcqvYU4YelzhD2zjkrMqkEwV0a5EobEP8ydK3ZnIeE2luj/6lj0Wvd6HQ1KTi7dvd+Q5lDhipUCR7VAnM6PQO66kJuWS6yazFIsfdLlJZKN9LdhHzguL43ZWiIH04DpXIG7yxc2CTAWIVAmr6V0tUiQjfA1Wylf5WivbxASDAWIyu5BUArR5CqBTXkks5KhSSyT2BK0m19jwWGKu1ZPxoiUC321wPfEkRjjJECFpe2yaLXlIqTzzzzIRFgXPB8phPJvnH9h7Zr7QzmzpYltHyfAqbSxJ1xO4Cy4GkP9TnqyJrBBZtWxMEW3bWYYQ2RFarBw4wdaTAkTrKrcHRNknpZVphQAVCFbmRwo29nSbofYqsfkHz2mL5TpoKr6OElbiJ18pY+PDtG/Q5p/HpeyTVrsNxOUQHwDGU6jBQLHYhr6AkHE6ICP9zgCdra0+oXeFdunLjzs5OzeIZwF4RiYSJhR0sZnqQwpog9kSvKBT0cfES2cxrwpM9mgmavClBrTy8dy/3jsoS1j4AKuHu6c6MpOpwVMlLxRxN54oPtpsPEaTbt2dmoS6d3ru3duvr9oIJaKS9fTv/8KaazmbN6psPc7efh/pJYQGA3iZWUUPl0cZGfNnZfXYIiJeRlCmZ3JCeObaj69ixWwMMh2qy2X37bt7UahG/NK2NtHECKbZhXycLR0ibV8eDCsV43kTqpGCi0IV0W+C1x0jiVMh5XriFYNfJrVMMfh7T0lsmkNabD4IyelDvkcSpESQdPx1iUAB1A86+jqiLNrZtxWLTpu5Dh7o3GSlQ1zqlmUTb734cCQjEhE8iK5cEckeeoYt2uT7ubxHd5dEZzBsFujYC4+OhGLWZYePKUKLFadexcMtM3FooTHJeo+Pgwe7u8HvscmhZZrM8ERqHSF19WTCTqEL08R9kD+Kil+1SC7CK9YpAqIQfRxUsmH2mce3C2hPniGHV0T96iB/pJL6p9l9V7zzGMB1v+fjHFTOrherF6ZW8cIGAyTWaLFQP26sqtt3Y/Mm3dX6cSj8+P/RVA45FJ/3+JGK+g+2VBZezG+dDHGWSx2yHsVe6Def83ST8bcGbIrvM0sxwNZIqKjy4FkmGyoyup9eGuAb2V4zEM7qsxiYmm1HpNNRnSVOvdN2Vlt26qEdvMD9q8DfxvvnYJn/DI8YxRQs66MWi90IkZCRxhTAlfQ3UPkZ6J5vrFuGSGBNHWdCxJWMCH1SnnMYOy7dRM6oxzslnjPz4BnepwUDsIm7I/QYjyXUShoYH9FRwJRqLD9xJtTK69GSCXonYbEn69sCbTL+aajnciQTKlvOJ4nKijCDVzy8nli8ujFlhmzW/iHzPVseMjc1XellG9Ouoe99ugZhaJCD9wXF9by3/4tFHum5Zd97D7AM60i+vRC7Grl6N0Q9Y2BKz91+p4BVEnRZnLTFjV9tnMoBZaP1nhUQUy4sCtKn5RtteeyOvdnK6bLZRnFEoVhSKu2JTNnsxy/EJMvHoV9mDTfXzVxIL6RNi+CwE5heTg5yn484oGG4J1GEQYfX1HDk/3wb3rNoUh+o8wAqN8GZ/nh7wPCmNdQKcaOutkEwuZ2lAinqb1azXanscSryRzc76faVryGhTW7YmDkW6Bh0aTJi/tOQlnrdqKGqslVARKh+7nl5htPuDL5yZ6D7zwgff7Op+M780G3zW2SU+GApHeoZDQX7//h/9YfBZ/vCj/Tuk9ddhB4cOO6nqvTTPR9eKsXSx5J65mI4V16I82tJ9wP2np72tn/6T+8AWhSLMaJWRHp9PG1W0QaVAR+Lufu+nvTeCkze8n36v21HgNZv0tYCEMPMn5jYpQELEIugs8MVJDCR0HMDUs0QyGt1SlMSpc0+oXbtSe8obFKkgHTGbTTWWDVw0Uin+57Uh/7wpvLbi81VaAUNfnk5lA8l1L9yslAZYmPnnY2up1KA77OJU/daeazEwEIv5/Y+mpnzMUXGsWCIWiyzZ3LybRf5uDimJxLy7tKjOLkbW1rlCtZiamAjdH0fz+yF4g8OxpWMulESqD7Zot1+4cWPiArNdxUVs5trmYUwSnUrgsuDFGG/WzovqAoGFdDCWgQDYnnvuQSX6Inb5byD+ffZ1NJiVuuZmndIu+v2i3e02Xr8374uWH4hv/vp1vT5689//vhl1j/NgsaAOze/Ob9onTHgv9AbI7x/E7ek7dZs5hLlcJxmV14ztRabF1A1/XtE/LzAcubio17dTn17k/NNTZpFBqRweL0G8avoDV6kfqVSJSvXGWFnyl8ibCEHyM0ZR/0rJZKl6zUffE3lrcfNiWVKTVNcnowZ5KDQ9reGRzBByeg18Y6W9hcNTojiDiJiXpuCj6GRqzTd4hKSnAtnIeMsBeP1eiCQ1e1T0FwDBk3HkLe9L6N6vPZCnmF+ENQBurs8gAF58GFZ3vIQcVt0AGhQAgAA/+p/glJL6b6GPvpdfrFP7k2h10u607TZUqzZ4VVJwVBpp8x7u9W26pdAg1UMaQHpH88A3Fb3eYLNCpK6XC22Vsuq3OYSq4MVEuX2BXDK1/uUnzd9EJZkfhZ1WfrGVi9sIkneUUtIcpcg7LZTTSuNzTBJ0Hew7hythl1lPOXtFTxuVHor20BCURav5kX7t8ZlnURO3yd6lmuPks/Khx9lIMRuoUqKBLumUsJlS4+s9HKNpG8D/xAvDxrhxi0H2JNVqdnvOR1jpUjfNfYqWPRVSZw0WS5MZIslDVl1gsQ6ejuxzae7uPbm79Z8d+qTRiv0ocENIxhM0xQWH+FMkQEqk+kYqKX2oIpI0HAyey1SrOoex1IhvhSrtpHaPMi6DvcYBEcINYvUXNlNJV0Q2L0XmIF+b6TLKvOU30+38Gd2RJzhkjX57VcKqqbaDcjOl5JhY/yl8mAJ0Gt1BC1EnFP3LI864y7rBKj0wJCdYfU+W1ST5k9ED8QiAUww40GLPg6RSu/IPBRYI2xNAb67LEIEwx0MU+KRDslplCLEhSUGIg6CkcXqmBB3Bh8I3UwjgjaeoIrZ9hCKlO8SC0NkQG1wcDXHgZ2eIBg8t0qMeQ4iLUFNDnpAZE+IhiDrkhQHEf37eEAPyNChj49LAqU4sDQeLcjW6O9TEBLcYuTO9B+txfNVPrkGFWrYD5SArH8+ml1kqm3ElU78FN2pp22cjXW+02F0vTXxho3INbCPu0sE4jdwhuXPyhVWJl2eYUQ4Rw6si8ZZqUDSQDeUko1AiUZyEWn9Q8Vok5dk/boPlypNrqME1/YnKBVK7qQcmhdsmrmidbAqJgiFUzOZO5gtuN8jyslSm8YBq2t6IRFT/rMbgVrFlpcYro+JyTrXik6kKjiYtTnnFDFXWcz5OjSYnMcGGdUc2dlM2nZ8jMSyX+snmsqidoLT6Mv9FMnEovDzKD20SPTKnAAPccE0Zt3KdVggXwSpSlArX3dT1s0/mv+Uz3W7vXeKV6fvtcUeVe/Y7sIVp8/seqPZwGxP/Me1Ix6aGg12dWluDdAZZ39P4x7uZ3Edc25Sqx29p4hOTnLRZiU9O8YM7m+TCsPl0zWaasb3p8n9y0ri9Ug+cLwFChNqLjR1ktpvPBzT8ZPCCN0zM0qkJ9yrFNWGCAx6+J/zawhwemIuPX/3mOAmp/iy4COOJBWYrHZtwCE08CJd4Eh6W0VrqsReeeOrl6/g/toSEngT20L8NznecO2n3Hvm/5lZb8X+i5TwtP8a7hKFbbce8PZ6u3w7rUdrWPZYPp95eCgAAAA==) format('woff2');}
 :root{
   color-scheme:dark;
   --void:#05070f; --deck:#0b1120; --deck2:#121c34;
@@ -142,6 +143,23 @@ canvas#game{display:block;width:100%;height:auto;touch-action:none;cursor:crossh
 .augcard .at{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.08);color:var(--mute);letter-spacing:.02em}
 .augcard .ai{display:block;height:28px}
 .augcard .aw{font-size:10.5px;color:var(--flux);opacity:.9}
+/* 카드가 한 장씩 뒤집히며 등장 — fill-mode 를 backwards 로 둬야 끝난 뒤 hover 이동이 먹는다 */
+.augs{perspective:900px}
+.augcard{animation:acIn .52s cubic-bezier(.2,1.25,.4,1) backwards}
+.augcard:nth-child(2){animation-delay:.09s}
+.augcard:nth-child(3){animation-delay:.18s}
+@keyframes acIn{from{opacity:0;transform:translateY(26px) rotateX(38deg) scale(.9)}to{opacity:1;transform:none}}
+.augcard.r2{box-shadow:inset 0 0 0 1px rgba(255,194,71,.08)}
+.augcard.r3::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:50%;pointer-events:none;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.2),transparent);
+  transform:skewX(-18deg);animation:acShine 3.2s .7s ease-in-out infinite}
+@keyframes acShine{0%{left:-60%}40%,100%{left:130%}}
+.augcard.r3{animation:acIn .52s cubic-bezier(.2,1.25,.4,1) backwards,acGlow 2.4s .6s ease-in-out infinite}
+.augcard.r3:nth-child(2){animation-delay:.09s,.69s}
+.augcard.r3:nth-child(3){animation-delay:.18s,.78s}
+@keyframes acGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,107,214,0)}50%{box-shadow:0 0 22px -4px rgba(255,107,214,.55)}}
+.augcard.uq .at{background:linear-gradient(90deg,#ff6bd6,#2fe0ff);color:#081018}
+@media (prefers-reduced-motion:reduce){ .augcard,.augcard.r3{animation:none} .augcard.r3::after{display:none} }
 @media (max-width:700px){ .augs{grid-template-columns:1fr} }
 .card{position:relative;padding:8px 8px 7px;border-radius:11px;border:1px solid var(--edge);text-align:left;
   background:rgba(255,255,255,.025);cursor:pointer;color:var(--ice);display:flex;flex-direction:column;gap:5px;
@@ -185,6 +203,48 @@ canvas#game{display:block;width:100%;height:auto;touch-action:none;cursor:crossh
 #feed b{color:var(--ice);font-weight:600}
 #feed .good b{color:var(--grow)} #feed .bad b{color:var(--breach)} #feed .warn b{color:var(--flux)}
 @keyframes fadein{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+
+/* ---------- 타이틀 ---------- */
+#title{position:fixed;inset:0;z-index:80;display:grid;place-items:center;overflow:hidden;
+  background:radial-gradient(1100px 700px at 50% 42%,rgba(18,42,80,.72),rgba(3,5,12,.94) 62%),rgba(3,5,12,.97);
+  backdrop-filter:blur(3px);animation:tfade .5s ease}
+#title.gone{animation:tout .45s ease forwards;pointer-events:none}
+@keyframes tfade{from{opacity:0}to{opacity:1}}
+@keyframes tout{to{opacity:0;transform:scale(1.04)}}
+.tstage{display:flex;flex-direction:column;align-items:center;gap:0;text-align:center;padding:20px;position:relative;z-index:2}
+.tmark{position:relative;width:104px;height:104px;margin-bottom:22px;animation:tpop .7s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes tpop{from{opacity:0;transform:scale(.4) rotate(-40deg)}to{opacity:1;transform:none}}
+.thex{position:absolute;inset:0;border:2px solid var(--core);opacity:.5;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.thex.h1{animation:tspin 7s linear infinite}
+.thex.h2{inset:13px;opacity:.32;animation:tspin 5s linear infinite reverse}
+.thex.h3{inset:26px;opacity:.22;animation:tspin 9s linear infinite}
+@keyframes tspin{to{transform:rotate(360deg)}}
+.tcore{position:absolute;inset:34px;background:linear-gradient(160deg,#9af4ff,var(--core));
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  box-shadow:0 0 34px 6px rgba(47,224,255,.55);animation:tbeat 2.6s ease-in-out infinite}
+@keyframes tbeat{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.5);transform:scale(1.07)}}
+.tname{margin:0;font-size:clamp(30px,6.4vw,62px);font-weight:700;letter-spacing:-.01em;line-height:1.1;
+  color:#eaf6ff;text-shadow:0 0 30px rgba(47,224,255,.55),0 0 80px rgba(47,224,255,.28);
+  animation:trise .6s .12s ease both}
+.tsub{font-family:var(--font-d);font-size:clamp(9px,1.7vw,12px);font-weight:700;letter-spacing:.42em;
+  color:var(--core);opacity:.75;margin:12px 0 0;animation:trise .6s .22s ease both}
+.tline{color:var(--mute);font-size:13.5px;margin:20px 0 0;max-width:40ch;line-height:1.7;
+  animation:trise .6s .32s ease both}
+#t-go{margin-top:30px;padding:16px 48px;font-size:16px;animation:trise .6s .42s ease both}
+.tfoot{display:flex;align-items:center;gap:12px;margin-top:26px;font-size:11.5px;color:var(--dim);
+  animation:trise .6s .54s ease both}
+.tfoot i{width:3px;height:3px;border-radius:50%;background:var(--dim);opacity:.6}
+@keyframes trise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.tscan{position:absolute;left:0;right:0;height:180px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(47,224,255,.06) 45%,rgba(47,224,255,.11) 50%,rgba(47,224,255,.06) 55%,transparent);
+  animation:tscan 5.5s linear infinite}
+@keyframes tscan{from{top:-200px}to{top:100%}}
+/* 증강 획득 섬광 */
+#augflash{position:fixed;inset:0;z-index:70;pointer-events:none;opacity:0}
+#augflash.go{animation:augf .6s ease forwards}
+@keyframes augf{0%{opacity:.5}100%{opacity:0}}
+@media (max-width:620px){ .tmark{width:78px;height:78px} .tcore{inset:25px} .thex.h3{inset:19px} }
 
 /* ---------- overlay ---------- */
 #veil{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;overflow:auto;
@@ -325,6 +385,23 @@ kbd{font-family:var(--font-d);font-size:10px;background:rgba(255,255,255,.09);bo
 </div>
 
 <div id="veil"><div class="sheet" id="sheet"></div></div>
+
+<div id="augflash"></div>
+
+<div id="title">
+  <div class="tstage">
+    <div class="tmark">
+      <span class="thex h1"></span><span class="thex h2"></span><span class="thex h3"></span>
+      <span class="tcore"></span>
+    </div>
+    <h1 class="tname">네온 코어 디펜스</h1>
+    <div class="tsub">N E O N &nbsp; C O R E &nbsp; D E F E N S E</div>
+    <p class="tline">회랑을 따라 밀려오는 침공체로부터 단 하나의 코어를 지켜라.</p>
+    <button class="big" id="t-go">게임 시작</button>
+    <div class="tfoot"><span>방어탑 52종</span><i></i><span>증강 1250종</span><i></i><span>온라인 협동전</span></div>
+  </div>
+  <div class="tscan"></div>
+</div>
 <script>
 (function(){
 'use strict';
@@ -775,9 +852,13 @@ const AUG_NUM=['dmg','rate','rng','crit','critMul','sPow','shred','vuln','enemyH
  'leakGold','antiHeal','shieldRegenCut','splitNo','bossSlow','bossArmor','prepGold','lifeGold',
  'first','fullHp','lowHp','near','far','bossWave','exec','corpse','rush','multi'];
 const AUG_MAP=['cDmg','cRate','cRng','tDmg','tRate','tRng','vs','tf'];
+/* 특수 증강 상태 — augReset() 이 모듈 로드 시점에 바로 호출되므로 그보다 먼저 선언돼야 한다 */
+const U={};
+function uReset(){ for(const k in U) delete U[k]; }
 const AUG={list:[],taken:{}};
 function augReset(){
  AUG.list=[]; AUG.taken={};
+ uReset();
  for(let i=0;i<AUG_NUM.length;i++) AUG[AUG_NUM[i]]=0;
  for(let i=0;i<AUG_MAP.length;i++) AUG[AUG_MAP[i]]={};
 }
@@ -933,6 +1014,192 @@ const AUG_SPEC={
  ['악마의 거래','goldKill=1,goldWave=1,enemyHp=-.15'],['초가속','rate=.6,dmg=-.12']
 ]};
 
+/* ═══════════ 특수 증강 ═══════════
+   수치만 올리는 증강과 달리, 규칙 자체를 바꾸는 것들.
+   U.<키> 값이 곧 그 증강의 세기이고, 0이면 없는 것이다. */
+const UNIQ=[
+ /* ── 건설·경제 판을 바꾸는 것 ── */
+ ['scrap',  2,'고물상','방어탑을 해체하면 남은 자리에 무작위 방어탑이 무료로 세워진다',1],
+ ['triplet',2,'삼위일체','같은 종류 방어탑 3기마다 그 종류의 피해 +30%',.30],
+ ['purist', 3,'단일 신념','서로 다른 방어탑 종류가 5가지 이하면 모든 피해 +70%',.70],
+ ['polymath',3,'만물박사','보유한 방어탑 종류 1가지당 모든 피해 +4%',.04],
+ ['gambler',2,'도박사','웨이브 보너스가 절반 확률로 2배, 절반 확률로 0이 된다',1],
+ ['broke',  2,'배수의 진','보유 에너지가 150 이하일 때 모든 피해 +90%',.90],
+ ['hoard',  3,'수집광','적을 처치할 때마다 모든 피해가 영구히 +0.04% (상한 +120%)',.0004],
+ ['legacy', 2,'유산','방어탑을 해체하면 남은 방어탑이 6초간 피해 +50%',.50],
+ /* ── 진형 ── */
+ ['phalanx',2,'밀집 대형','상하좌우로 맞닿은 방어탑끼리 서로 피해 +10%',.10],
+ ['lone',   2,'고독한 포수','주위 2칸에 다른 방어탑이 없으면 그 탑 피해 +55%',.55],
+ ['frontline',2,'전선 사수','코어에서 멀리 있는 방어탑일수록 피해 증가 (최대 +65%)',.65],
+ ['lastwall',2,'배수진 포대','코어 3칸 이내 방어탑 피해 +75%',.75],
+ /* ── 전투 규칙 ── */
+ ['domino', 3,'도미노','적이 죽으면 가장 가까운 적에게 그 적 최대 체력의 25%만큼 피해',.25],
+ ['freeze', 3,'시간 정지','18초마다 모든 적이 1.6초 동안 완전히 멈춘다',1.6],
+ ['echo',   3,'메아리','모든 공격이 0.35초 뒤 35% 위력으로 한 번 더 들어간다',.35],
+ ['icetomb',2,'얼음 무덤','빙결이 풀리는 순간 그 적이 폭발한다',.35],
+ ['snow',   2,'눈덩이','처치할 때마다 피해 +3%, 웨이브가 끝나면 초기화 (상한 +150%)',.03],
+ ['phoenix',3,'불사조의 심장','코어가 무너지는 순간 단 한 번 내구도 12로 되살아난다',12],
+ ['verdict',2,'심판','웨이브의 마지막 적은 즉시 소멸한다',1],
+ ['firstblood',1,'선취점','웨이브의 첫 처치마다 에너지 +120',120],
+ ['rage',   2,'광전사의 분노','잃은 내구도 1당 모든 피해 +3%',.03],
+ ['perfect',3,'완벽주의','무실점으로 끝낸 다음 웨이브는 피해 +50%',.50],
+ ['spree',  2,'연쇄 살인','3초 안에 6기를 처치하면 5초간 연사 2배',1],
+ ['patience',2,'저격수의 인내','발사하지 않은 1초당 다음 피해 +30% (최대 4배)',.30],
+ ['overload',2,'과부하 방출','방어탑이 25번 쏠 때마다 주변에 폭발을 일으킨다',1],
+ ['siphon2',2,'생명 흡수','준 피해의 0.4%가 코어 수리로 쌓인다',.004],
+ ['mirror', 2,'거울 방벽','침투당하면 그 적의 최대 체력만큼 모든 적이 피해를 입는다',1],
+ ['glass',  3,'유리 심장','최대 내구도가 1이 되는 대신 모든 피해 3배',3],
+ ['delay',  2,'지연 폭발','준 피해의 35%가 2초 뒤에 한 번 더 들어간다',.35],
+ ['fracture',2,'균열','같은 적을 6번 때리면 그 적의 방어력이 영구히 0이 된다',6],
+ ['reaper', 2,'사신의 낫','체력 30% 이하인 적에게 주는 피해 2배',1],
+ ['crowd',  2,'군중 제압','반경 1.5칸 안에 적이 5기 이상이면 그 무리 피해 +60%',.60],
+ ['sprint', 3,'전력 질주','적 이동속도 +35%, 대신 모든 피해 +90%',.90],
+ ['tide',   2,'밀물','웨이브 후반 30% 구간에서 피해 2배',1],
+ ['vanguard',2,'선봉','웨이브 전반 30% 구간에서 피해 2배',1],
+ /* ── 방어탑 동작 ── */
+ ['twin',   3,'이중 포신','방어탑이 9초마다 한 번 2.5배 위력으로 쏜다',2.5],
+ ['focus',  2,'집중 사격','같은 적을 계속 노릴수록 피해 증가 (최대 +110%)',1.10],
+ ['spread', 2,'산개 사격','방어탑이 매번 다른 적을 노리는 대신 피해 +35%',.35],
+ ['locomotive',2,'폭주 기관차','웨이브가 진행될수록 연사 증가 (초당 +2%, 최대 +80%)',.02],
+ ['coregun',3,'코어 방위포','코어가 4초마다 선두의 적을 직접 저격한다',1],
+ ['preheat',2,'예열','웨이브 시작 4초 동안 모든 연사 3배',3],
+ ['autotune',2,'자동 정비','웨이브가 끝날 때마다 무작위 방어탑 1기를 무료로 강화',1],
+ ['barrelroll',1,'난사','모든 공격이 12% 확률로 한 발 더 나간다',.12],
+ /* ── 극단적 거래 ── */
+ ['allin',  3,'전부 걸기','에너지 수입 2.5배, 대신 코어 최대 내구도 절반',2.5],
+ ['pacifist',3,'무장 해제','방어탑을 5기까지만 지을 수 있는 대신 피해 4배',4],
+ ['tax',    2,'과세','건설·강화 비용 40% 인상, 모든 피해 +85%',.85],
+ ['fragile',2,'살얼음','침투 한 번에 내구도가 3배로 깎이는 대신 피해 +75%',.75],
+ ['speedrun',2,'속공','준비 시간이 사라지는 대신 웨이브 보너스 3배',3],
+ ['jackpot',2,'잭팟','처치 시 2% 확률로 에너지 1000',.02],
+ ['endless',3,'무한 동력','방어탑 강화 비용이 레벨과 무관하게 고정된다',1]
+];
+/* 특수 증강 계산 도우미 */
+function uTowerMul(t){
+ let m=0;
+ if(U.polymath){ m+=U.polymath*towerKinds(); }
+ if(U.purist&&towerKinds()<=5) m+=U.purist;
+ if(U.broke&&G.gold<=150) m+=U.broke;
+ if(U.rage) m+=U.rage*Math.max(0,G.maxLives-G.lives);
+ if(U.snow) m+=Math.min(1.5,U.snow*(G.snowKills||0));
+ if(U.hoard) m+=Math.min(1.2,U.hoard*(G.hoardKills||0));
+ if(U.glass) m+=U.glass-1;
+ if(U.sprint) m+=U.sprint;
+ if(U.tax) m+=U.tax;
+ if(U.fragile) m+=U.fragile;
+ if(U.pacifist) m+=U.pacifist-1;
+ if(U.perfect&&G.perfectOn) m+=U.perfect;
+ if(t){
+  if(U.triplet) m+=U.triplet*Math.floor(kindCount(t.id)/3);
+  if(U.phalanx) m+=U.phalanx*(t.adj||0);
+  if(U.lone&&t.adj===0&&t.near2===0) m+=U.lone;
+  if(U.frontline) m+=U.frontline*clamp(t.coreDist||0,0,1);
+  if(U.lastwall&&(t.coreTiles||99)<=3) m+=U.lastwall;
+  if(U.spread) m+=U.spread;
+  if(U.focus&&t.focusE) m+=Math.min(U.focus,(t.focusT||0)*.22);
+  if(U.patience) m+=Math.min(3,U.patience*Math.max(0,(G.time-(t.lastFire||0))-.5));
+  if(U.twin&&t.twinReady) m+=U.twin-1;
+ }
+ if(U.vanguard&&G.waveOn&&G.waveProg<.3) m+=U.vanguard;
+ if(U.tide&&G.waveOn&&G.waveProg>.7) m+=U.tide;
+ return m;
+}
+function towerKinds(){
+ if(G.kindsF===G.frame) return G.kindsN;
+ const seen={}; let n=0;
+ for(let i=0;i<G.towers.length;i++){ const id=G.towers[i].id; if(!seen[id]){ seen[id]=1; n++; } }
+ G.kindsF=G.frame; G.kindsN=n; return n;
+}
+function kindCount(id){
+ if(G.kcF!==G.frame){ G.kcF=G.frame; G.kc={};
+  for(let i=0;i<G.towers.length;i++){ const k=G.towers[i].id; G.kc[k]=(G.kc[k]||0)+1; } }
+ return G.kc[id]||0;
+}
+/* 진형 관련 값은 구조가 바뀔 때만 다시 잰다 */
+function uGeom(){
+ const n=G.towers.length;
+ let far=1;
+ for(let i=0;i<n;i++){
+  const t=G.towers[i];
+  const d=Math.hypot(t.x-G.core.x,t.y-G.core.y);
+  t.coreRaw=d; if(d>far) far=d;
+  t.coreTiles=Math.round(d/TILE);
+ }
+ for(let i=0;i<n;i++){
+  const t=G.towers[i];
+  t.coreDist=t.coreRaw/far;
+  let adj=0, near2=0;
+  for(let j=0;j<n;j++){
+   if(i===j) continue;
+   const o=G.towers[j], dx=Math.abs(o.tx-t.tx), dy=Math.abs(o.ty-t.ty);
+   if(dx+dy===1) adj++;
+   if(dx<=2&&dy<=2) near2++;
+  }
+  t.adj=adj; t.near2=near2;
+ }
+}
+/* 특수 증강의 시간 기반 효과 */
+function uStep(dt){
+ if(U.freeze){
+  G.freezeT=(G.freezeT||0)+dt;
+  if(G.freezeT>=18){
+   G.freezeT=0;
+   let n=0;
+   for(let i=0;i<G.enemies.length;i++){
+    const e=G.enemies[i];
+    if(!e.alive) continue;
+    e.stun=Math.max(e.stun,U.freeze); n++;
+   }
+   if(n){ ring(G.core.x,G.core.y,300,'#9df0ff',.9,4); SND.play('cryo'); feed('<b>시간 정지</b> · 모든 적이 멈췄습니다','good'); }
+  }
+ }
+ if(U.coregun){
+  G.cgT=(G.cgT||0)+dt;
+  if(G.cgT>=4){
+   G.cgT=0;
+   let best=null,bp=-1;
+   for(let i=0;i<G.enemies.length;i++){ const e=G.enemies[i]; if(e.alive&&e.prog>bp){ bp=e.prog; best=e; } }
+   if(best){
+    const dmg=140+G.wave*45;
+    beam(G.core.x,G.core.y,best.x,best.y,'#9af4ff',.35,5);
+    hurt(best,dmg,{src:null,nocrit:true});
+    boom(best.x,best.y,44,'#9af4ff');
+    SND.play('rail',60);
+   }
+  }
+ }
+ if(U.spree){
+  G.spreeWin=(G.spreeWin||0)-dt;
+  if(G.spreeWin<=0){ G.spreeWin=3; G.spreeN=0; }
+  if(G.spreeT>0) G.spreeT-=dt;
+ }
+ if(U.twin){
+  for(let i=0;i<G.towers.length;i++){
+   const t=G.towers[i];
+   t.twinT=(t.twinT||0)+dt;
+   if(t.twinT>=9){ t.twinT=0; t.twinReady=1; }
+  }
+ }
+ if(U.delay&&G.delayQ&&G.delayQ.length){
+  for(let i=G.delayQ.length-1;i>=0;i--){
+   const q=G.delayQ[i];
+   q.t-=dt;
+   if(q.t>0) continue;
+   G.delayQ.splice(i,1);
+   if(q.e&&q.e.alive) hurt(q.e,q.d,{src:q.src,aug:true,silent:true,nocrit:true});
+  }
+ }
+ if(U.echo&&G.echoQ&&G.echoQ.length){
+  for(let i=G.echoQ.length-1;i>=0;i--){
+   const q=G.echoQ[i];
+   q.t-=dt;
+   if(q.t>0) continue;
+   G.echoQ.splice(i,1);
+   if(q.e&&q.e.alive) hurt(q.e,q.d,{src:q.src,aug:true,silent:true,nocrit:true});
+  }
+ }
+}
+
 function parseFx(str){
  const fx={}, parts=str.split(',');
  for(let i=0;i<parts.length;i++){
@@ -956,7 +1223,7 @@ const TAG_GROUP={
  '상태이상':['slow','burn','stun','splash','chain','freeze','knock','shredHit','dotAmp'],
  '조건부':['first','fullHp','lowHp','near','far','bossWave','exec'],
  '처치':['corpse','rush','overkill'],
- '특수':['multi','retro']
+ '특수':['multi','retro','uniq']
 };
 function augTag(fx){
  for(const k in fx) if(typeof fx[k]==='number'&&fx[k]<0) return '리스크';
@@ -1181,6 +1448,11 @@ const TV={
  }
 })();
 
+/* 특수 증강을 등급별 목록에 섞어 넣는다 */
+for(let i=0;i<UNIQ.length;i++){
+ const u=UNIQ[i];
+ AUG_SPEC[u[1]].push([u[2],'uniq.'+u[0]+'='+u[4]]);
+}
 const AUGMENTS=[], AUG_BY_ID={};
 for(let r=1;r<=3;r++){
  const list=AUG_SPEC[r];
@@ -1280,6 +1552,12 @@ function augDesc(a){
     for(const tw in v){ for(const f in v[tw]) out.push(tfDesc(tw,f,v[tw][f])); }
     continue;
    }
+   if(k==='uniq'){
+    for(const uk in v){
+     for(let i=0;i<UNIQ.length;i++) if(UNIQ[i][0]===uk) out.push(UNIQ[i][3]);
+    }
+    continue;
+   }
    for(const s in v){
     const x=v[s], sup=TOWERS[s]&&TOWERS[s].hits==='none';
     if(k==='cDmg') out.push(CAT_N[s]+' 계열 피해 '+pct(x));
@@ -1304,6 +1582,7 @@ function applyAug(a){
  const fx=a.fx;
  for(const k in fx){
   const v=fx[k];
+  if(k==='uniq'){ for(const uk in v) U[uk]=(U[uk]||0)+v[uk]; continue; }
   if(typeof v==='object'){
    for(const s in v){
     const vv=v[s];
@@ -1361,106 +1640,310 @@ function rollAugments(n){
  return picks;
 }
 
-/* ═══════════ 사운드 ═══════════ */
+/* ═══════════ 사운드 ═══════════
+   마스터 체인: 각 소리 → (드라이 + 리버브 센드) → 마스터 → 리미터 → 출력
+   리미터를 거치기 때문에 적이 수십 마리 터져도 소리가 찢어지지 않는다. */
 const SND={
- ctx:null,master:null,gSfx:null,gMus:null,noise:null,on:true,musOn:true,last:Object.create(null),ready:false,
+ ctx:null,master:null,comp:null,gSfx:null,gMus:null,verb:null,send:null,
+ noise:null,on:true,musOn:true,last:Object.create(null),ready:false,voices:0,
  init(){
   if(this.ctx) return;
   const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
   try{
-   this.ctx=new AC();
-   this.master=this.ctx.createGain(); this.master.gain.value=.85; this.master.connect(this.ctx.destination);
-   this.gSfx=this.ctx.createGain(); this.gSfx.gain.value=.42; this.gSfx.connect(this.master);
-   this.gMus=this.ctx.createGain(); this.gMus.gain.value=0; this.gMus.connect(this.master);
-   const len=(this.ctx.sampleRate*1.5)|0, buf=this.ctx.createBuffer(1,len,this.ctx.sampleRate), d=buf.getChannelData(0);
+   const c=new AC(); this.ctx=c;
+
+   this.comp=c.createDynamicsCompressor();
+   this.comp.threshold.value=-10; this.comp.knee.value=8; this.comp.ratio.value=12;
+   this.comp.attack.value=.003; this.comp.release.value=.2;
+   this.comp.connect(c.destination);
+
+   this.master=c.createGain(); this.master.gain.value=.9; this.master.connect(this.comp);
+   this.gSfx=c.createGain(); this.gSfx.gain.value=.5; this.gSfx.connect(this.master);
+   this.gMus=c.createGain(); this.gMus.gain.value=0; this.gMus.connect(this.master);
+
+   /* 합성 임펄스로 만든 짧은 공간감 */
+   this.verb=c.createConvolver();
+   this.verb.buffer=this.mkIR(1.9,2.6);
+   const vg=c.createGain(); vg.gain.value=.9;
+   this.verb.connect(vg); vg.connect(this.master);
+   this.send=c.createGain(); this.send.gain.value=1; this.send.connect(this.verb);
+
+   const len=(c.sampleRate*1.6)|0, b=c.createBuffer(1,len,c.sampleRate), d=b.getChannelData(0);
    for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
-   this.noise=buf; this.ready=true;
+   this.noise=b;
+   this.ready=true;
   }catch(e){ this.ready=false; }
  },
+ mkIR(dur,decay){
+  const c=this.ctx, n=(c.sampleRate*dur)|0, buf=c.createBuffer(2,n,c.sampleRate);
+  for(let ch=0;ch<2;ch++){
+   const d=buf.getChannelData(ch);
+   let lp=0;
+   for(let i=0;i<n;i++){
+    const t=i/n;
+    const v=(Math.random()*2-1)*Math.pow(1-t,decay);
+    lp+=(v-lp)*.35;                 /* 어둡게 굴려서 쇳소리를 없앤다 */
+    d[i]=lp;
+   }
+  }
+  return buf;
+ },
  resume(){ if(this.ctx&&this.ctx.state==='suspended') this.ctx.resume().catch(()=>{}); },
+ busy(){ return this.voices>26; },
+
+ /* ── 기본 목소리 ── */
  tone(o){
-  if(!this.ready||!this.on) return;
+  if(!this.ready||!this.on||this.busy()) return;
   const c=this.ctx,t=c.currentTime+(o.at||0);
   const osc=c.createOscillator(), g=c.createGain();
   osc.type=o.type||'sine';
   osc.frequency.setValueAtTime(o.f,t);
   if(o.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(20,o.f2),t+o.d);
+  if(o.detune) osc.detune.value=o.detune;
   g.gain.setValueAtTime(0,t);
-  g.gain.linearRampToValueAtTime(o.g||.2,t+(o.atk||.006));
+  g.gain.linearRampToValueAtTime(o.g||.2,t+(o.atk||.005));
   g.gain.exponentialRampToValueAtTime(.0001,t+o.d);
   let node=osc;
-  if(o.lp){ const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=o.lp; node.connect(f); node=f; }
+  if(o.lp){
+   const f=c.createBiquadFilter(); f.type='lowpass';
+   f.frequency.setValueAtTime(o.lp,t);
+   if(o.lp2) f.frequency.exponentialRampToValueAtTime(Math.max(60,o.lp2),t+o.d);
+   f.Q.value=o.q||.7;
+   node.connect(f); node=f;
+  }
   node.connect(g); g.connect(this.gSfx);
+  if(o.verb) g.connect(this.send);
+  this.voices++;
+  osc.onended=()=>{ this.voices--; };
   osc.start(t); osc.stop(t+o.d+.02);
  },
  hiss(o){
-  if(!this.ready||!this.on) return;
+  if(!this.ready||!this.on||this.busy()) return;
   const c=this.ctx,t=c.currentTime+(o.at||0);
   const s=c.createBufferSource(); s.buffer=this.noise;
+  if(o.rate) s.playbackRate.value=o.rate;
   const f=c.createBiquadFilter(); f.type=o.type||'lowpass';
   f.frequency.setValueAtTime(o.f,t);
   if(o.f2) f.frequency.exponentialRampToValueAtTime(Math.max(40,o.f2),t+o.d);
   f.Q.value=o.q||1;
   const g=c.createGain();
-  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(o.g||.2,t+.005);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(o.g||.2,t+(o.atk||.004));
   g.gain.exponentialRampToValueAtTime(.0001,t+o.d);
   s.connect(f); f.connect(g); g.connect(this.gSfx);
+  if(o.verb) g.connect(this.send);
+  this.voices++;
+  s.onended=()=>{ this.voices--; };
   s.start(t); s.stop(t+o.d+.02);
  },
+ /* FM 한 방 — 금속성 타격음에 쓴다 */
+ fm(o){
+  if(!this.ready||!this.on||this.busy()) return;
+  const c=this.ctx,t=c.currentTime+(o.at||0);
+  const car=c.createOscillator(), mod=c.createOscillator(), mg=c.createGain(), g=c.createGain();
+  car.type='sine'; mod.type='sine';
+  car.frequency.setValueAtTime(o.f,t);
+  if(o.f2) car.frequency.exponentialRampToValueAtTime(Math.max(20,o.f2),t+o.d);
+  mod.frequency.setValueAtTime(o.f*(o.ratio||2.4),t);
+  mg.gain.setValueAtTime(o.idx||300,t);
+  mg.gain.exponentialRampToValueAtTime(1,t+o.d*.8);
+  mod.connect(mg); mg.connect(car.frequency);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(o.g||.18,t+.004);
+  g.gain.exponentialRampToValueAtTime(.0001,t+o.d);
+  car.connect(g); g.connect(this.gSfx);
+  if(o.verb) g.connect(this.send);
+  this.voices++;
+  car.onended=()=>{ this.voices--; };
+  car.start(t); mod.start(t); car.stop(t+o.d+.02); mod.stop(t+o.d+.02);
+ },
+ chord(notes,o){
+  o=o||{};
+  for(let i=0;i<notes.length;i++)
+   this.tone({f:notes[i],type:o.type||'triangle',d:o.d||.5,g:(o.g||.09),
+    at:(o.at||0)+i*(o.stag||.06),lp:o.lp||4000,verb:o.verb});
+ },
+
  play(name,gate){
   if(!this.ready||!this.on) return;
   if(gate){ const now=performance.now(); if(this.last[name]&&now-this.last[name]<gate) return; this.last[name]=now; }
   switch(name){
-   case 'pulse':  this.tone({f:900,f2:420,type:'square',d:.07,g:.055}); break;
-   case 'mortar': this.tone({f:150,f2:52,type:'sawtooth',d:.16,g:.14,lp:900}); break;
-   case 'cryo':   this.hiss({f:2600,f2:600,d:.24,g:.06,type:'bandpass',q:2}); break;
-   case 'arc':    this.tone({f:1500,f2:180,type:'sawtooth',d:.14,g:.08}); this.hiss({f:4000,f2:900,d:.12,g:.05,type:'highpass'}); break;
-   case 'venom':  this.hiss({f:800,f2:220,d:.18,g:.07,type:'bandpass',q:3}); break;
-   case 'rail':   this.tone({f:2400,f2:180,type:'sine',d:.3,g:.13}); this.hiss({f:6000,f2:400,d:.22,g:.06,type:'highpass'}); break;
-   case 'boom':   this.hiss({f:1400,f2:70,d:.42,g:.2}); this.tone({f:110,f2:36,type:'sine',d:.36,g:.16}); break;
-   case 'die':    this.tone({f:520,f2:150,type:'triangle',d:.14,g:.07}); break;
-   case 'bigdie': this.hiss({f:1800,f2:60,d:.7,g:.24}); this.tone({f:180,f2:40,type:'sawtooth',d:.6,g:.16,lp:700}); break;
-   case 'build':  this.tone({f:520,type:'triangle',d:.1,g:.14}); this.tone({f:784,type:'triangle',d:.16,g:.12,at:.07}); break;
-   case 'up':     [523,659,784,1046].forEach((f,i)=>this.tone({f:f,type:'triangle',d:.16,g:.11,at:i*.055})); break;
-   case 'sell':   [784,587,440].forEach((f,i)=>this.tone({f:f,type:'triangle',d:.13,g:.1,at:i*.05})); break;
-   case 'nope':   this.tone({f:170,f2:110,type:'square',d:.13,g:.09}); break;
-   case 'wave':   [329,415,494,659].forEach((f,i)=>this.tone({f:f,type:'sawtooth',d:.5,g:.055,at:i*.09,lp:1800})); break;
-   case 'leak':   this.tone({f:300,f2:70,type:'sawtooth',d:.55,g:.17,lp:800}); this.hiss({f:500,f2:90,d:.5,g:.12}); break;
-   case 'bossin': this.tone({f:70,f2:44,type:'sawtooth',d:1.5,g:.22,lp:420}); this.tone({f:104,f2:66,type:'square',d:1.3,g:.1,lp:500,at:.1}); break;
-   case 'win':    [523,659,784,1046,1318].forEach((f,i)=>this.tone({f:f,type:'triangle',d:.7,g:.13,at:i*.13})); break;
-   case 'lose':   [392,330,262,196].forEach((f,i)=>this.tone({f:f,type:'sawtooth',d:.85,g:.13,at:i*.2,lp:1100})); break;
+   /* ── 사격 ── */
+   case 'pulse':
+    this.fm({f:760,f2:300,d:.07,g:.05,ratio:3.1,idx:420});
+    this.hiss({f:5200,f2:1800,d:.035,g:.022,type:'highpass'});
+    break;
+   case 'mortar':
+    this.tone({f:150,f2:44,type:'sawtooth',d:.2,g:.13,lp:900,lp2:260});
+    this.hiss({f:1400,f2:300,d:.16,g:.07});
+    break;
+   case 'cryo':
+    this.hiss({f:3000,f2:700,d:.3,g:.055,type:'bandpass',q:2.4,verb:1});
+    this.tone({f:1800,f2:2600,type:'sine',d:.22,g:.03,at:.02,verb:1});
+    break;
+   case 'arc':
+    this.tone({f:1700,f2:150,type:'sawtooth',d:.15,g:.075,lp:4200,lp2:700});
+    this.hiss({f:5200,f2:900,d:.13,g:.05,type:'highpass'});
+    break;
+   case 'venom':
+    this.hiss({f:900,f2:230,d:.2,g:.06,type:'bandpass',q:3.4});
+    this.tone({f:320,f2:150,type:'triangle',d:.16,g:.04,lp:1400});
+    break;
+   case 'rail':
+    this.tone({f:420,f2:2600,type:'sawtooth',d:.07,g:.05,lp:5000});
+    this.tone({f:2600,f2:170,type:'sine',d:.34,g:.13,at:.05,verb:1});
+    this.hiss({f:7000,f2:500,d:.26,g:.055,type:'highpass',at:.05,verb:1});
+    break;
+   /* ── 폭발 ── */
+   case 'boom':
+    this.tone({f:110,f2:32,type:'sine',d:.42,g:.19,verb:1});
+    this.hiss({f:1800,f2:90,d:.4,g:.17});
+    this.hiss({f:6000,f2:2000,d:.06,g:.07,type:'highpass'});
+    break;
+   /* ── 적 ── */
+   case 'die':
+    this.fm({f:460,f2:170,d:.11,g:.05,ratio:1.6,idx:150});
+    break;
+   case 'bigdie':
+    this.tone({f:190,f2:34,type:'sawtooth',d:.8,g:.17,lp:900,lp2:160,verb:1});
+    this.hiss({f:2400,f2:70,d:.85,g:.2,verb:1});
+    this.tone({f:70,f2:26,type:'sine',d:1,g:.2});
+    break;
+   /* ── 건설·경제 ── */
+   case 'build':
+    this.tone({f:560,type:'triangle',d:.1,g:.1,lp:5000});
+    this.tone({f:840,type:'triangle',d:.2,g:.09,at:.06,lp:6000,verb:1});
+    break;
+   case 'up':
+    this.chord([523,659,784,1046],{d:.24,g:.085,stag:.055,verb:1});
+    this.hiss({f:7000,f2:2500,d:.3,g:.03,type:'highpass',at:.05});
+    break;
+   case 'sell':
+    this.chord([784,587,440],{d:.16,g:.08,stag:.05});
+    break;
+   case 'nope':
+    this.tone({f:190,f2:105,type:'square',d:.14,g:.08,lp:1200});
+    break;
+   /* ── 웨이브 ── */
+   case 'wave':
+    this.chord([329.6,415.3,493.9,659.3],{type:'sawtooth',d:.7,g:.05,stag:.085,lp:2200,verb:1});
+    this.tone({f:82,type:'sine',d:.9,g:.13});
+    break;
+   case 'bossin':
+    this.tone({f:64,f2:40,type:'sawtooth',d:1.8,g:.2,lp:420,lp2:140,verb:1});
+    this.tone({f:96,f2:60,type:'square',d:1.5,g:.07,lp:500,at:.08});
+    this.hiss({f:400,f2:80,d:1.6,g:.07,at:.1,verb:1});
+    break;
+   case 'leak':
+    this.tone({f:300,f2:58,type:'sawtooth',d:.6,g:.16,lp:900,lp2:200});
+    this.hiss({f:600,f2:70,d:.55,g:.13,verb:1});
+    break;
+   /* ── 증강 ── */
+   case 'aug1':
+    this.chord([523,784],{d:.4,g:.09,stag:.05,verb:1});
+    this.hiss({f:6000,f2:2000,d:.25,g:.03,type:'highpass'});
+    break;
+   case 'aug2':
+    this.chord([523,659,880,1318],{d:.6,g:.095,stag:.06,verb:1});
+    this.tone({f:131,type:'sine',d:.7,g:.1});
+    break;
+   case 'aug3':
+    this.chord([523,659,784,1046,1318,1568],{d:1.1,g:.09,stag:.07,lp:7000,verb:1});
+    this.tone({f:65.4,type:'sawtooth',d:1.3,g:.13,lp:700});
+    this.hiss({f:1000,f2:9000,d:.7,g:.05,type:'bandpass',q:1.4,verb:1});
+    break;
+   case 'augshow':
+    this.tone({f:300,f2:1200,type:'sine',d:.35,g:.05,verb:1});
+    this.hiss({f:1200,f2:6000,d:.4,g:.035,type:'bandpass',q:1.2});
+    break;
+   /* ── 결과 ── */
+   case 'win':
+    this.chord([523,659,784,1046,1318],{d:.9,g:.11,stag:.13,verb:1});
+    this.tone({f:131,type:'sine',d:1.4,g:.12});
+    break;
+   case 'lose':
+    this.chord([392,330,262,196],{type:'sawtooth',d:1,g:.11,stag:.2,lp:1100,verb:1});
+    this.tone({f:49,type:'sine',d:1.8,g:.14});
+    break;
   }
  },
- /* ── 절차적 배경음 ── */
- mStep:0,mNext:0,mTimer:null,intensity:0,
+
+ /* ── 절차적 배경음 ──
+    킥·스네어·하이햇·베이스·아르페지오·패드를 16분음표 격자에 얹고,
+    교전 강도(intensity)에 따라 필터와 트랙 수를 열고 닫는다. */
+ mStep:0,mNext:0,mTimer:null,intensity:0,inten:0,
  startMusic(){
   if(!this.ready||this.mTimer) return;
   this.mNext=this.ctx.currentTime+.1; this.mStep=0;
-  this.mTimer=setInterval(()=>this.pump(),90);
-  this.gMus.gain.setTargetAtTime(this.musOn?.3:0,this.ctx.currentTime,.6);
+  this.mTimer=setInterval(()=>this.pump(),70);
+  this.gMus.gain.setTargetAtTime(this.musOn?.34:0,this.ctx.currentTime,.7);
  },
- stopMusic(){ if(this.mTimer){clearInterval(this.mTimer);this.mTimer=null;} if(this.ready) this.gMus.gain.setTargetAtTime(0,this.ctx.currentTime,.3); },
- setMusic(v){ this.musOn=v; if(this.ready) this.gMus.gain.setTargetAtTime(v?.3:0,this.ctx.currentTime,.35); },
- mvoice(f,t,d,g,type,lp){
+ stopMusic(){
+  if(this.mTimer){ clearInterval(this.mTimer); this.mTimer=null; }
+  if(this.ready) this.gMus.gain.setTargetAtTime(0,this.ctx.currentTime,.3);
+ },
+ setMusic(v){
+  this.musOn=v;
+  if(this.ready) this.gMus.gain.setTargetAtTime(v?.34:0,this.ctx.currentTime,.35);
+ },
+ mv(f,t,d,g,type,lp,detune,dest){
   const c=this.ctx,o=c.createOscillator(),gn=c.createGain(),fl=c.createBiquadFilter();
   o.type=type; o.frequency.setValueAtTime(f,t);
-  fl.type='lowpass'; fl.frequency.setValueAtTime(lp,t);
-  gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(g,t+.02);
+  if(detune) o.detune.value=detune;
+  fl.type='lowpass'; fl.frequency.setValueAtTime(lp,t); fl.Q.value=.8;
+  gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(g,t+.015);
   gn.gain.exponentialRampToValueAtTime(.0001,t+d);
-  o.connect(fl); fl.connect(gn); gn.connect(this.gMus);
+  o.connect(fl); fl.connect(gn); gn.connect(dest||this.gMus);
   o.start(t); o.stop(t+d+.05);
+ },
+ drum(kind,t,g){
+  const c=this.ctx;
+  if(kind==='kick'){
+   const o=c.createOscillator(), gn=c.createGain();
+   o.type='sine'; o.frequency.setValueAtTime(130,t);
+   o.frequency.exponentialRampToValueAtTime(42,t+.11);
+   gn.gain.setValueAtTime(g,t); gn.gain.exponentialRampToValueAtTime(.0001,t+.24);
+   o.connect(gn); gn.connect(this.gMus);
+   o.start(t); o.stop(t+.26);
+   return;
+  }
+  const s=c.createBufferSource(); s.buffer=this.noise;
+  const f=c.createBiquadFilter(), gn=c.createGain(), hat=kind==='hat';
+  if(hat){ f.type='highpass'; f.frequency.value=7200; }
+  else { f.type='bandpass'; f.frequency.value=1900; f.Q.value=.9; }
+  gn.gain.setValueAtTime(g,t); gn.gain.exponentialRampToValueAtTime(.0001,t+(hat?.045:.19));
+  s.connect(f); f.connect(gn); gn.connect(this.gMus);
+  s.start(t); s.stop(t+(hat?.06:.2));
  },
  pump(){
   if(!this.ready) return;
-  const c=this.ctx, spb=60/96/2;  // 8분음표
-  const BASS=[55,0,0,55,0,73.42,0,0,65.41,0,0,65.41,0,49,0,0];
-  const ARP =[0,440,0,523.25,659.25,0,523.25,0,0,392,0,440,523.25,0,392,0];
-  while(this.mNext < c.currentTime+.4){
-   const s=this.mStep%16, t=this.mNext, hot=this.intensity;
-   if(BASS[s]) this.mvoice(BASS[s],t,.42,.16,'sawtooth',300+hot*250);
-   if(ARP[s])  this.mvoice(ARP[s]*(hot>.5?2:1),t,.3,.045+hot*.03,'triangle',2400);
-   if(s%4===0) this.mvoice(58,t,.13,.14,'sine',180);
-   if(hot>.35&&s%2===1) this.mvoice(1200,t,.05,.012,'square',5000);
+  const c=this.ctx, spb=60/96/4;          /* 96 BPM, 16분음표 */
+  /* 강도는 천천히 따라간다 — 갑자기 음악이 튀지 않게 */
+  this.inten+=(this.intensity-this.inten)*.08;
+  const hot=this.inten;
+
+  const BASS=[55,0,0,55,0,0,73.42,0, 65.41,0,0,65.41,0,0,49,0,
+              55,0,0,55,0,73.42,0,0, 87.31,0,0,82.41,0,0,73.42,0];
+  const ARP =[440,0,523.25,0,659.25,0,523.25,0, 587.33,0,440,0,659.25,0,880,0,
+              440,0,523.25,0,783.99,0,659.25,0, 587.33,0,493.88,0,440,0,329.63,0];
+  const PAD =[220,0,0,0,0,0,0,0, 174.61,0,0,0,0,0,0,0,
+              220,0,0,0,0,0,0,0, 196,0,0,0,0,0,0,0];
+
+  if(this.mNext<c.currentTime-.05) this.mNext=c.currentTime+.05;
+  while(this.mNext<c.currentTime+.35){
+   const s=this.mStep%32, t=this.mNext;
+
+   if(s%8===0) this.drum('kick',t,.34);
+   else if(s===12||s===28) this.drum('kick',t,.2);
+   if(hot>.25&&(s===8||s===24)) this.drum('snare',t,.16+hot*.08);
+   if(hot>.12&&s%4===2) this.drum('hat',t,.05+hot*.05);
+   if(hot>.6&&s%2===1) this.drum('hat',t,.025);
+
+   if(BASS[s]) this.mv(BASS[s],t,.34,.15,'sawtooth',260+hot*420);
+   if(ARP[s]&&hot>.08) this.mv(ARP[s]*(hot>.55?2:1),t,.22,.03+hot*.035,'triangle',3200);
+   if(PAD[s]&&hot>.3){
+    this.mv(PAD[s],t,2.1,.022+hot*.02,'sawtooth',420+hot*700,-6);
+    this.mv(PAD[s],t,2.1,.022+hot*.02,'sawtooth',420+hot*700,+7);
+   }
    this.mNext+=spb; this.mStep++;
   }
  }
@@ -1487,10 +1970,11 @@ const G={
  chaos:false, repBank:0, pathSamples:null, tab:0,
  duel:{on:false,seed:0,turn:1,p1:null,p2:null}, duelSel:false, rng:null,
  paths:[], core:null, coop:false, coopSel:false, coopSolo:false, side:-1, myLeak:0, ghost:null,
+ buffsDirty:true,
  occ:null, sel:null, buy:null,
  hover:{x:-1,y:-1}, mouse:{x:-1,y:-1,in:false},
  speed:1, paused:false,
- time:0, shake:0, flash:0, killed:0, leaked:0, earned:0, dealt:0,
+ time:0, frame:0, shake:0, flash:0, killed:0, leaked:0, earned:0, dealt:0,
  lowfx:false, tips:0
 };
 
@@ -1541,7 +2025,7 @@ const buildable=(tx,ty)=>tx>=0&&ty>=0&&tx<COLS&&ty<ROWS&&!onPath(tx,ty)&&!G.bloc
 
 /* ═══════════ 이펙트 ═══════════ */
 function part(x,y,vx,vy,life,size,col,grav,drag){
- if(G.parts.length>620) return;
+ if(G.parts.length>(G.lowfx?260:620)) return;
  G.parts.push({x:x,y:y,vx:vx,vy:vy,life:life,max:life,size:size,col:col,grav:grav||0,drag:drag===undefined?.93:drag});
 }
 function burst(x,y,col,n,pw){
@@ -1552,10 +2036,11 @@ function say(x,y,s,col,size){
  if(G.texts.length>60) return;
  G.texts.push({x:x,y:y,s:String(s),col:col,size:size||11,life:.8,max:.8,vy:-32,vx:rnd(-9,9)});
 }
-function ring(x,y,r,col,life,wide){ G.fx.push({k:'ring',x:x,y:y,r:r,col:col,life:life||.4,max:life||.4,w:wide||2}); }
-function boom(x,y,r,col){ G.fx.push({k:'boom',x:x,y:y,r:r,col:col,life:.42,max:.42}); }
-function bolt(pts,col,life){ G.fx.push({k:'bolt',pts:pts,col:col,life:life||.18,max:life||.18}); }
-function beam(x1,y1,x2,y2,col,life,w){ G.fx.push({k:'beam',x1:x1,y1:y1,x2:x2,y2:y2,col:col,life:life||.26,max:life||.26,w:w||3}); }
+function addFx(o){ if(G.fx.length<(G.lowfx?150:340)) G.fx.push(o); }
+function ring(x,y,r,col,life,wide){ addFx({k:'ring',x:x,y:y,r:r,col:col,life:life||.4,max:life||.4,w:wide||2}); }
+function boom(x,y,r,col){ addFx({k:'boom',x:x,y:y,r:r,col:col,life:.42,max:.42}); }
+function bolt(pts,col,life){ addFx({k:'bolt',pts:pts,col:col,life:life||.18,max:life||.18}); }
+function beam(x1,y1,x2,y2,col,life,w){ addFx({k:'beam',x1:x1,y1:y1,x2:x2,y2:y2,col:col,life:life||.26,max:life||.26,w:w||3}); }
 
 /* ═══════════ 침공체 ═══════════ */
 function makeEnemy(type,waveN,dist,lane){
@@ -1569,7 +2054,7 @@ function makeEnemy(type,waveN,dist,lane){
   markV:0, markT:0, frostT:0, gasT:0, kcd:0, fcd:0, scd:0,
   gold:Math.max(1,Math.round(D.gold*goldScale(waveN))),
   dist:dist||0, x:0,y:0, ang:0, prog:0,
-  spd:D.spd*G.D.spd*(G.chaos?chaosSpd(waveN):1)*clamp(1-AUG.enemySpd,.6,1.2)*(D.boss?Math.max(.5,1-AUG.bossSlow):1), slow:0, slowT:0, freeze:0, stun:0, pois:[], brk:0,
+  spd:D.spd*G.D.spd*(G.chaos?chaosSpd(waveN):1)*clamp(1-AUG.enemySpd,.6,1.2)*(D.boss?Math.max(.5,1-AUG.bossSlow):1)*(U.sprint?1.35:1), slow:0, slowT:0, freeze:0, stun:0, pois:[], brk:0,
   shield:D.shield?D.shield.amt*hs:0, shieldMax:D.shield?D.shield.amt*hs:0, shieldT:0,
   healCd:rnd(0,1), spawnCd:3, alive:true, hitT:0, hasted:false,
   wob:Math.random()*TAU, spin:rnd(-1.6,1.6), age:0
@@ -1605,13 +2090,17 @@ function hurt(e,amount,o){
   if(AUG.far&&dd>=25600) mul+=AUG.far;
  }
  if(e.markT>G.time) mul+=e.markV;
+ if(U.reaper&&e.hp<=e.maxHp*.3) mul+=1;
+ if(U.crowd&&e.packed) mul+=U.crowd;
  if(e.freeze>0&&e.frostT>G.time) mul+=.4;
  dmg*=mul;
  const vul=AUG.vuln+(e.vuln||0);
  if(vul) dmg*=(1+vul);
  if((o.pure||o.tick)&&AUG.dotAmp) dmg*=(1+AUG.dotAmp);
+ if(U.fracture&&direct){ e.hitN=(e.hitN||0)+1; if(e.hitN===U.fracture) ring(e.x,e.y,e.r+12,'#ff8a3d',.4,2); }
  if(!o.pure){
   let ar=e.armor-AUG.shred-(e.shred||0)-(e.brk||0)-(e.acid||0);
+  if(U.fracture&&(e.hitN||0)>=U.fracture) ar=0;
   if(e.gasT>G.time) ar*=.5;
   ar=Math.max(0,ar*(1-(o.pen||0)));
   if(ar<=0&&e.acidPerk) dmg*=1.25;
@@ -1655,7 +2144,15 @@ function hurt(e,amount,o){
   }
   return dmg;
  }
- if(direct&&!o.tick) augOnHit(e,src,dmg);
+ if(direct&&!o.tick){
+  augOnHit(e,src,dmg);
+  if(U.echo){ (G.echoQ=G.echoQ||[]).push({e:e,d:dmg*U.echo,src:src,t:.35}); }
+  if(U.delay){ (G.delayQ=G.delayQ||[]).push({e:e,d:dmg*U.delay,src:src,t:2}); }
+  if(U.siphon2){ G.repBank=(G.repBank||0)+dmg*U.siphon2/Math.max(1,G.maxLives); }
+  if(src&&U.focus){
+   if(src.focusE===e) src.focusT=(src.focusT||0)+1; else { src.focusE=e; src.focusT=0; }
+  }
+ }
  return dmg;
 }
 function augOnHit(e,src,dmg){
@@ -1697,7 +2194,7 @@ function augOnHit(e,src,dmg){
 function kill(e,src){
  if(!e.alive) return;
  e.alive=false;
- let gain=e.gold*(1+AUG.goldKill)*(G.chaos?1.35:1);
+ let gain=e.gold*(1+AUG.goldKill)*(G.chaos?1.35:1)*(U.allin?U.allin:1);
  if(e.cursed) gain*=2;
  if(e.bounty) gain*=(1+e.bounty);
  if(e.D.boss) gain*=(1+AUG.bossGold);
@@ -1713,6 +2210,28 @@ function kill(e,src){
  if(e.D.boss){ G.shake=Math.max(G.shake,18); boom(e.x,e.y,90,'#ff5b6e'); SND.play('bigdie'); feed('<b>'+e.D.name+'</b> 격파','good'); }
  else SND.play('die',40);
  if(AUG.rush>0) G.rushT=3;
+ if(U.snow) G.snowKills=(G.snowKills||0)+1;
+ if(U.hoard) G.hoardKills=(G.hoardKills||0)+1;
+ if(U.firstblood&&!G.fbDone){ G.fbDone=1; G.gold+=U.firstblood; G.earned+=U.firstblood;
+  say(e.x,e.y-26,'선취점 +'+U.firstblood,'#ffc247',15); }
+ if(U.jackpot&&Math.random()<U.jackpot){ G.gold+=1000; G.earned+=1000;
+  say(e.x,e.y-30,'잭팟 +1000','#fff08a',19); SND.play('aug3'); }
+ if(U.spree){
+  G.spreeN=(G.spreeN||0)+1;
+  if(G.spreeN>=6){ G.spreeN=0; G.spreeT=5; feed('<b>연쇄 살인</b> · 5초간 연사 2배','good'); SND.play('up'); }
+ }
+ if(U.icetomb&&e.freeze>0){ boom(e.x,e.y,54,'#bfe6ff'); splashAt(e.x,e.y,54,e.maxHp*U.icetomb,src,{aug:true,silent:true}); }
+ if(U.domino){
+  let best=null,bd=1e9;
+  for(let i=0;i<G.enemies.length;i++){
+   const o=G.enemies[i];
+   if(!o.alive||o===e) continue;
+   const dd=d2(e.x,e.y,o.x,o.y);
+   if(dd<bd){ bd=dd; best=o; }
+  }
+  if(best){ beam(e.x,e.y,best.x,best.y,'#ffd7a0',.25,3);
+   hurt(best,e.maxHp*U.domino,{src:src,aug:true,silent:true,nocrit:true}); }
+ }
  if(AUG.killHeal>0&&G.lives<G.maxLives&&Math.random()<AUG.killHeal){
   healCore(1); say(G.core.x,G.core.y-34,'+1 내구도','#5ef2a4',14);
  }
@@ -1755,14 +2274,29 @@ function leak(e){
   return;
  }
  if(AUG.leakGold>0){ G.gold+=AUG.leakGold; G.earned+=AUG.leakGold; flashGold(); }
- G.myLeak=(G.myLeak|0)+e.D.leak; G.leaked++;
- if(G.coop) G.lives=coopLives(); else G.lives-=e.D.leak;
+ if(U.mirror){
+  const dmg=e.maxHp;
+  for(let i=0;i<G.enemies.length;i++){ const o=G.enemies[i];
+   if(o.alive&&o!==e) hurt(o,dmg,{src:null,aug:true,silent:true,nocrit:true}); }
+  ring(G.core.x,G.core.y,320,'#b9c6ff',.7,4);
+ }
+ G.perfectWave=0;
+ const lk=e.D.leak*(U.fragile?3:1);
+ G.myLeak=(G.myLeak|0)+lk; G.leaked++;
+ if(G.coop) G.lives=coopLives(); else G.lives-=lk;
  if(G.coop&&!G.coopSolo) NET.push(true);
  G.shake=Math.max(G.shake,e.D.boss?22:9); G.flash=1;
  boom(c.x,c.y,64,'#ff4d6d');
  SND.play('leak',100);
  feed('<b>'+e.D.name+'</b> 코어 침투 · 내구도 -'+e.D.leak,'bad');
- if(G.lives<=0){ G.lives=0; finish(false); }
+ if(G.lives<=0){
+  if(U.phoenix&&!G.phoenixUsed){
+   G.phoenixUsed=1; G.myLeak=0; G.lives=Math.min(G.maxLives,U.phoenix);
+   banner('부활','불사조가 코어를 되살렸다');
+   ring(G.core.x,G.core.y,360,'#ffc247',1.1,5); SND.play('aug3');
+   feed('<b>불사조</b> · 코어가 되살아났습니다','good');
+  } else { G.lives=0; finish(false); }
+ }
 }
 
 /* ═══════════ 방어탑 ═══════════ */
@@ -1770,7 +2304,7 @@ function makeTower(id,tx,ty){
  const D=TOWERS[id];
  return {id:id,D:D,tx:tx,ty:ty,x:(tx+.5)*TILE,y:(ty+.5)*TILE,lv:0,cd:rnd(0,.3),
   ang:-Math.PI/2, mode:(id==='sever'||id==='marker')?'strong':'first', spent:buildCost(id), dmg:0, kills:0,
-  recoil:0, spin:0, bd:0, br:0, bg:0, bc:0, bcm:0, bm:0, cc:0, cm:1.9, spinup:0, gacc:0,
+  recoil:0, spin:0, bd:0, br:0, bg:0, bc:0, bcm:0, bm:0, cc:0, cm:1.9, spinup:0, gacc:0, _sf:-1, _s:null,
   lock:null, lockT:0, mines:0, born:G.time};
 }
 function supPow(t){ return 1+AUG.sPow+(AUG.tDmg[t.id]||0); }
@@ -1802,14 +2336,20 @@ function tlv(t){
  return o;
 }
 function tstat(t){
+ /* 같은 프레임 안에서는 계산 결과를 재사용한다. 조준·발사·렌더가 각각 부르기 때문에
+    캐시가 없으면 타워 한 기당 프레임마다 객체를 서너 개씩 새로 만들게 된다. */
+ if(t._sf===G.frame&&t._s) return t._s;
  const L=tlv(t), id=t.id, c=CAT_OF[id], sup=t.D.hits==='none';
  let dm=1+t.bd+AUG.dmg+(AUG.cDmg[c]||0)+(AUG.tDmg[id]||0);
  if(AUG.waveDmg) dm+=Math.min(1.5,AUG.waveDmg*G.wave);
  if(AUG.towerCount) dm+=Math.min(1,AUG.towerCount*G.towers.length);
  if(AUG.goldDmg) dm+=Math.min(1,AUG.goldDmg*Math.floor(G.gold/1000));
  if(AUG.lvDmg&&t.lv===3) dm+=AUG.lvDmg;
- dm=Math.max(.3,dm);
+ dm=Math.max(.3,dm)*(1+uTowerMul(t));
  let rm=1+t.br+AUG.rate+(AUG.cRate[c]||0)+(AUG.tRate[id]||0)+(G.rushT>0?AUG.rush:0);
+ if(G.spreeT>0) rm*=2;
+ if(U.preheat&&G.preheatT>0) rm*=U.preheat;
+ if(U.locomotive&&G.waveOn) rm*=1+Math.min(.8,U.locomotive*G.waveT);
  if(AUG.lv0Rate&&t.lv===0) rm+=AUG.lv0Rate;
  rm=Math.max(.3,rm);
  if(id==='gatling') rm*=1+(L.spin||0)*(t.spinup||0);
@@ -1831,10 +2371,12 @@ function tstat(t){
  s.ddur=L.ddur||0; s.pellets=L.pellets||0; s.spread=L.spread||0; s.salvo=L.salvo||0;
  s.pdur=L.pdur||0; s.prad=L.prad||0; s.cap=L.cap||0; s.wide=L.wide||0;
  s.cone=L.cone||0; s.bdur=L.bdur||0; s.stun=L.stun||0; s.pull=L.pull||0;
+ t._sf=G.frame; t._s=s;
  return s;
 }
 const SUPBUFF={amp:1,chrono:1,radar:1,overclock:1};
 function refreshBuffs(){
+ G.buffsDirty=false;
  const n=G.towers.length;
  let any=false;
  for(let i=0;i<n;i++){
@@ -1860,6 +2402,7 @@ function refreshBuffs(){
   t.bd=Math.min(t.bd,1.8); t.br=Math.min(t.br,1.4);
   t.bg=Math.min(t.bg,.6); t.bc=Math.min(t.bc,.7); t.bm=Math.min(t.bm,.5);
  }
+ uGeom();   /* 진형 기반 특수 증강(밀집·고독·전선·배수진)이 쓰는 값 */
 }
 /* 저주·정지장·현상금·시간붕괴 오라를 적에게 각인 */
 function applyAuras(){
@@ -1896,9 +2439,15 @@ function applyAuras(){
 }
 function buildCost(id){
  if(AUG.freeBuild>=1) return 0;
+ if(U.tax) return Math.round(TOWERS[id].cost*1.4*(1-Math.min(.6,AUG.buildDisc)));
  return Math.max(10,Math.round(TOWERS[id].cost*(1-Math.min(.6,AUG.buildDisc))));
 }
-function upCost(t){ return t.lv>=3?0:Math.max(5,Math.round(t.D.lv[t.lv+1].cost*(1-Math.min(.6,AUG.upDisc)))); }
+function upCost(t){
+ if(t.lv>=3) return 0;
+ let c=U.endless?t.D.lv[1].cost:t.D.lv[t.lv+1].cost;
+ if(U.tax) c*=1.4;
+ return Math.max(5,Math.round(c*(1-Math.min(.6,AUG.upDisc))));
+}
 function sellValue(t){ return Math.floor(t.spent*Math.min(1,.7+AUG.sellBack)); }
 
 /* ═══════════ 조준 · 사격 ═══════════ */
@@ -1916,14 +2465,18 @@ function canHit(e,hits){
 function findTarget(t,s){
  const r2=s.rng*s.rng, hits=t.D.hits;
  let best=null,bk=-Infinity;
+ const avoid=(U.spread&&t.lastTg&&t.lastTg.alive)?t.lastTg:null;
  for(let i=0;i<G.enemies.length;i++){
   const e=G.enemies[i];
   if(!e.alive||!canHit(e,hits)) continue;
   const dd=d2(t.x,t.y,e.x,e.y);
   if(dd>r2) continue;
+  if(e===avoid) continue;
   const k=targetKey(t,e,dd);
   if(k>bk){ bk=k; best=e; }
  }
+ if(!best&&avoid) best=avoid;
+ if(U.spread) t.lastTg=best;
  return best;
 }
 function findTargets(t,s,n){
@@ -2910,6 +3463,15 @@ function updateBlade(t,dt){
 }
 /* ═══════════ 침공체 갱신 ═══════════ */
 function updateEnemies(dt){
+ if(U.crowd&&G.frame%6===0){
+  const n=G.enemies.length, R=TILE*1.5, R2=R*R;
+  for(let i=0;i<n;i++){
+   const e=G.enemies[i]; if(!e.alive) continue;
+   let c=0;
+   for(let j=0;j<n;j++){ const o=G.enemies[j]; if(o.alive&&d2(e.x,e.y,o.x,o.y)<=R2) c++; }
+   e.packed=c>=5;
+  }
+ }
  let bosses=null;
  for(let i=0;i<G.enemies.length;i++){
   const e=G.enemies[i]; e.hasted=false;
@@ -2998,7 +3560,8 @@ function updateEnemies(dt){
 function startWave(){
  if(G.waveOn||G.scene!=='play') return;
  G.wave++;
- G.waveOn=true; G.waveT=0; G.queue=[];
+ G.waveOn=true; G.waveT=0; G.queue=[]; G.fbDone=0; G.perfectWave=1; G.waveProg=0;
+ G.perfectOn=!!(U.perfect&&G.lastPerfect); G.snowKills=0; G.preheatT=U.preheat?4:0;
  let shGen=0;
  for(let i=0;i<G.towers.length;i++){ const t=G.towers[i]; if(t.id==='bulwark') shGen+=tlv(t).sh*supPow(t); }
  G.shBank=(G.shBank||0)+shGen;
@@ -3014,6 +3577,7 @@ function startWave(){
   for(let k=0;k<cnt;k++) G.queue.push({t:g[0],at:g[3]+k*g[2]});
  }
  G.queue.sort((a,b)=>a.at-b.at);
+ G.waveTotal=G.queue.length;
  banner('WAVE '+G.wave, boss?'경보 · 파괴자 접근':(G.chaos?'아수라장':(G.endless?'무한 교전':'')));
  SND.play(boss?'bossin':'wave');
  SND.intensity=clamp(G.wave/22,0,1);
@@ -3022,9 +3586,15 @@ function startWave(){
  syncUI();
 }
 function endWave(){
- G.waveOn=false;
+ G.waveOn=false; G.verdictDone=0;
  G.mines=[]; G.pools=[]; G.bombs=[]; G.crawlers=[]; G.vortex=[];
+ G.lastPerfect=!!G.perfectWave;
  let bonus=Math.round((22+G.wave*3.4)*(1+AUG.goldWave)*(G.chaos?1.5:1));
+ if(U.speedrun) bonus*=U.speedrun;
+ if(U.allin) bonus*=U.allin;
+ if(U.gambler){ const w=Math.random()<.5; bonus=w?bonus*2:0;
+  feed(w?'<b>도박 성공</b> · 보너스 2배':'<b>도박 실패</b> · 보너스 없음',w?'good':'bad'); }
+ bonus=Math.round(bonus);
  /* 채굴기 생산 */
  let mined=0, repair=0, compound=0;
  for(let i=0;i<G.towers.length;i++){
@@ -3053,7 +3623,13 @@ function endWave(){
  SND.intensity=.25;
  if(!G.endless&&!G.chaos&&G.wave>=LAST_WAVE){ finish(true); return; }
  if(G.chaos&&G.wave%10===0) banner('생존 '+G.wave+' 웨이브','아수라장 돌파');
+ if(U.autotune&&G.towers.length){
+  const pool=G.towers.filter(function(t){ return t.lv<3; });
+  if(pool.length){ const t=pool[(Math.random()*pool.length)|0]; t.lv++; G.buffsDirty=true;
+   ring(t.x,t.y,60,t.D.col,.6,3); feed('<b>자동 정비</b> · '+t.D.name+' 강화','good'); }
+ }
  G.prepMax=(G.chaos?14:12)+AUG.prepBonus; G.prep=G.prepMax;
+ if(U.speedrun) G.prep=0.01;
  syncUI();
  if(G.chaos&&(G.wave===1||(G.wave-1)%3===0)){ offerAugments(); return; }
 }
@@ -3082,6 +3658,7 @@ function callWave(){
 function tryPlace(tx,ty){
  if(!G.buy) return;
  const D=TOWERS[G.buy], price=buildCost(G.buy);
+ if(U.pacifist&&G.towers.length>=5){ SND.play('nope',140); feed('무장 해제 · 방어탑은 5기까지만','warn'); return; }
  if(!buildable(tx,ty)){ SND.play('nope',140); return; }
  if(G.gold<price){ SND.play('nope',140); feed('에너지가 부족합니다 · <b>'+price+'</b> 필요','warn'); return; }
  G.gold-=price;
@@ -3119,41 +3696,73 @@ function sellTower(t){
  burst(t.x,t.y,'#8095bd',15,1.2);
  say(t.x,t.y-16,'+'+v,'#ffc247',13);
  SND.play('sell');
+ if(U.legacy) G.rushT=Math.max(G.rushT,6);
+ if(U.scrap){
+  const pool=TCATS[(Math.random()*TCATS.length)|0].ids;
+  const id=pool[(Math.random()*pool.length)|0];
+  const nt=makeTower(id,t.tx,t.ty);
+  nt.spent=0;
+  G.towers.push(nt); G.occ[t.ty*COLS+t.tx]=nt; G.buffsDirty=true;
+  ring(nt.x,nt.y,52,nt.D.col,.6,3);
+  feed('<b>고물상</b> · '+nt.D.name+'(으)로 재활용','good');
+ }
  G.sel=null; syncUI();
 }
 
 /* ═══════════ 진행 ═══════════ */
 function step(dt){
- G.time+=dt;
+ G.time+=dt; G.frame++;
  if(G.shake>0) G.shake=Math.max(0,G.shake-dt*40);
  if(G.flash>0) G.flash=Math.max(0,G.flash-dt*2.4);
 
- for(let i=G.fx.length-1;i>=0;i--){ const f=G.fx[i]; f.life-=dt; if(f.life<=0) G.fx.splice(i,1); }
- for(let i=G.parts.length-1;i>=0;i--){
-  const p=G.parts[i]; p.life-=dt;
-  if(p.life<=0){ G.parts.splice(i,1); continue; }
+ /* 수명이 끝난 이펙트는 splice 로 하나씩 빼지 않고 한 번에 앞으로 당겨 정리한다 */
+ /* 고정 스텝(dt=FIX)에서는 감쇠 계수의 거듭제곱이 1제곱이라 계산을 건너뛴다 */
+ const fixed=dt===FIX;
+ let w=0;
+ const fx=G.fx;
+ for(let i=0;i<fx.length;i++){ const f=fx[i]; f.life-=dt; if(f.life>0) fx[w++]=f; }
+ fx.length=w;
+ const ps=G.parts; w=0;
+ for(let i=0;i<ps.length;i++){
+  const p=ps[i]; p.life-=dt;
+  if(p.life<=0) continue;
   p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=p.grav*dt;
-  const k=Math.pow(p.drag,dt*60); p.vx*=k; p.vy*=k;
+  const k=fixed?p.drag:Math.pow(p.drag,dt*60); p.vx*=k; p.vy*=k;
+  ps[w++]=p;
  }
- for(let i=G.texts.length-1;i>=0;i--){
-  const q=G.texts[i]; q.life-=dt;
-  if(q.life<=0){ G.texts.splice(i,1); continue; }
-  q.y+=q.vy*dt; q.x+=q.vx*dt; q.vy*=Math.pow(.945,dt*60);
+ ps.length=w;
+ const tx=G.texts; w=0;
+ for(let i=0;i<tx.length;i++){
+  const q=tx[i]; q.life-=dt;
+  if(q.life<=0) continue;
+  q.y+=q.vy*dt; q.x+=q.vx*dt; q.vy*=fixed?.945:Math.pow(.945,dt*60);
+  tx[w++]=q;
  }
+ tx.length=w;
  if(G.scene!=='play') return;
 
- refreshBuffs();
+ /* 버프는 타워를 짓거나 팔거나 강화할 때만 바뀐다 — 매 프레임 O(타워²)로 다시 계산하지 않는다 */
+ if(G.buffsDirty){ refreshBuffs(); }
+ uStep(dt);
  if(G.rushT>0) G.rushT-=dt;
  if(!G.waveOn&&G.prep>0&&AUG.prepGold>0){ G.pAcc+=AUG.prepGold*dt; if(G.pAcc>=1){ const g=Math.floor(G.pAcc); G.pAcc-=g; G.gold+=g; G.earned+=g; } }
  if(G.waveOn&&AUG.passive>0){ G.pAcc+=AUG.passive*dt; if(G.pAcc>=1){ const g=Math.floor(G.pAcc); G.pAcc-=g; G.gold+=g; G.earned+=g; } }
 
+ if(G.preheatT>0) G.preheatT-=dt;
  if(G.waveOn){
   G.waveT+=dt;
+ if(U.verdict&&G.waveOn&&!G.queue.length&&G.enemies.length===1&&G.enemies[0].alive&&!G.enemies[0].D.boss&&!G.verdictDone){
+   G.verdictDone=1;
+   const e=G.enemies[0];
+   say(e.x,e.y-24,'심판','#ff6bd6',16); boom(e.x,e.y,60,'#ff6bd6');
+   hurt(e,e.hp+e.shield+1e6,{src:null,silent:true,nocrit:true,pen:1,ignoreShield:true});
+  }
   while(G.queue.length&&G.queue[0].at<=G.waveT){
    const q=G.queue.shift();
    if(G.coop&&G.side<0){ G.enemies.push(makeEnemy(q.t,G.wave,0,0)); G.enemies.push(makeEnemy(q.t,G.wave,0,1)); }
    else G.enemies.push(makeEnemy(q.t,G.wave,0,G.side<0?0:G.side));
   }
+  G.waveProg=G.queue.length?(1-G.queue.length/Math.max(1,G.waveTotal||1)):1;
   if(!G.queue.length&&!G.enemies.length) endWave();
  } else if(G.prep>0){
   G.prep-=dt;
@@ -3185,6 +3794,10 @@ function step(dt){
   if(t.cd<=0){
    if(fire(t)){
     const s=tstat(t); t.cd=1/Math.max(.05,s.rate);
+    t.lastFire=G.time; t.twinReady=0;
+    if(U.overload){ t.shots=(t.shots||0)+1;
+     if(t.shots>=25){ t.shots=0; boom(t.x,t.y,70,'#ffb066'); splashAt(t.x,t.y,70,tstat(t).dmg*3,t,{}); SND.play('boom',80); } }
+    if(U.barrelroll&&Math.random()<U.barrelroll) t.cd=Math.min(t.cd,.06);
     if(t.id==='gatling') t.spinup=Math.min(1,(t.spinup||0)+.1);
     const mc=Math.min(.6,AUG.multi+(t.bm||0));
     if(mc>0&&Math.random()<mc) t.cd=Math.min(t.cd,.07);
@@ -4020,19 +4633,23 @@ function drawBeams(g){
 function drawParts(g){
  if(!G.parts.length) return;
  g.save(); g.globalCompositeOperation='lighter';
+ const lo=G.lowfx;
  for(let i=0;i<G.parts.length;i++){
-  const p=G.parts[i], a=clamp(p.life/p.max,0,1);
+  const p=G.parts[i], a=clamp(p.life/p.max,0,1), r=p.size*a+.4;
   g.globalAlpha=a*.9; g.fillStyle=p.col;
-  g.beginPath(); g.arc(p.x,p.y,p.size*a+.4,0,TAU); g.fill();
+  /* 작은 입자나 저사양 모드에서는 원 대신 사각형 — 경로를 만들지 않아 훨씬 싸다 */
+  if(lo||r<1.6) g.fillRect(p.x-r,p.y-r,r*2,r*2);
+  else { g.beginPath(); g.arc(p.x,p.y,r,0,TAU); g.fill(); }
  }
  g.restore();
 }
 function drawTexts(g){
  g.save(); g.textAlign='center'; g.textBaseline='middle'; g.lineJoin='round';
+ let sz=-1;
  for(let i=0;i<G.texts.length;i++){
   const q=G.texts[i], a=clamp(q.life/q.max,0,1);
   g.globalAlpha=a<.35?a/.35:1;
-  g.font='700 '+q.size+'px Orbitron, sans-serif';
+  if(q.size!==sz){ sz=q.size; g.font='700 '+sz+'px Orbitron, sans-serif'; }
   g.lineWidth=3.4; g.strokeStyle='rgba(2,5,12,.8)'; g.strokeText(q.s,q.x,q.y);
   g.fillStyle=q.col; g.fillText(q.s,q.x,q.y);
  }
@@ -4258,6 +4875,12 @@ function hintText(h){
  E.hint.innerHTML=h; E.hint.classList.remove('off');
  clearTimeout(hintTimer);
  hintTimer=setTimeout(function(){ E.hint.classList.add('off'); },7000);
+}
+function augFlash(col){
+ const f=E.flash;
+ if(!f) return;
+ f.style.background='radial-gradient(circle at 50% 50%,'+col+'55,transparent 62%)';
+ f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
 }
 function banner(txt,sub){
  E.bannerT.textContent=txt; E.bannerS.textContent=sub||'';
@@ -4951,7 +5574,7 @@ function offerAugments(){
  let cards='';
  for(let i=0;i<picks.length;i++){
   const a=picks[i], R=RARITY[a.r];
-  cards+='<button type="button" class="augcard r'+a.r+'" data-aug="'+a.id+'">'+
+  cards+='<button type="button" class="augcard r'+a.r+(a.fx.uniq?' uq':'')+'" data-aug="'+a.id+'">'+
    '<span class="ahead"><span class="rr">'+R.n+'</span><span class="at">'+a.tag+'</span></span>'+
    (a.tw?'<span class="ai">'+tIcon(a.tw,26)+'</span>':'')+
    '<span class="an">'+a.n+'</span><span class="ad">'+augDesc(a)+'</span>'+
@@ -4969,7 +5592,7 @@ function offerAugments(){
  for(let i=0;i<cs.length;i++) cs[i].addEventListener('click',function(){
   takeAugment(this.dataset.aug);
  });
- SND.play('up');
+ SND.play('augshow');
  return true;
 }
 function takeAugment(id){
@@ -4986,7 +5609,8 @@ function takeAugment(id){
  buildShop();
  renderAugList();
  syncUI();
- SND.play('win');
+ SND.play('aug'+a.r);
+ augFlash(RARITY[a.r].c);
  banner(a.n,RARITY[a.r].n+' 증강');
 }
 
@@ -5039,7 +5663,7 @@ function showMenu(resumable){
   '<button type="button" class="mapcard'+(mSel===0?' on':'')+'" data-mode="0" style="flex-direction:column">'+
    '<div class="nm">정규전</div><div class="sub">설계된 '+LAST_WAVE+'개 웨이브 · 방어탑 52종 · 완주하면 승리</div></button>'+
   '<button type="button" class="mapcard'+(mSel===1?' on':'')+'" data-mode="1" style="flex-direction:column">'+
-   '<div class="nm" style="color:#ff6bd6">아수라장</div><div class="sub">끝없는 웨이브 · 적이 계속 강해짐 · 3웨이브마다 증강 <b style="color:#ff6bd6">1200종</b> 중 택1</div></button>'+
+   '<div class="nm" style="color:#ff6bd6">아수라장</div><div class="sub">끝없는 웨이브 · 적이 계속 강해짐 · 3웨이브마다 증강 <b style="color:#ff6bd6">1250종</b> 중 택1</div></button>'+
   '<button type="button" class="mapcard'+(mSel===2?' on':'')+'" data-mode="2" style="flex-direction:column">'+
    '<div class="nm" style="color:#5ef2a4">1 대 1 친선전</div><div class="sub">같은 시드로 번갈아 도전 · 증강 후보까지 동일 · 더 깊이 간 쪽이 승리</div></button>'+
   '<button type="button" class="mapcard'+(mSel===3?' on':'')+'" data-mode="3" style="flex-direction:column">'+
@@ -5167,7 +5791,9 @@ function startGame(endless){
  G.chaos=!!G.chaosSel;
  G.duel.on=!!G.duelSel;
  if(!G.coopSel){ G.side=-1; G.coopSolo=false; }
- G.myLeak=0; G.ghost=null;
+ G.myLeak=0; G.ghost=null; G.buffsDirty=true;
+ G.snowKills=0; G.hoardKills=0; G.phoenixUsed=0; G.lastPerfect=0; G.perfectOn=0;
+ G.spreeN=0; G.spreeT=0; G.freezeT=0; G.cgT=0; G.echoQ=[]; G.delayQ=[]; G.verdictDone=0;
  if(G.duel.on){ if(!G.duel.seed) G.duel.seed=(Math.random()*1e9)|0; G.rng=mulberry32(G.duel.seed); }
  else G.rng=null;
  syncDiffBadge();
@@ -5175,7 +5801,10 @@ function startGame(endless){
  G.occ=new Array(COLS*ROWS).fill(null);
  G.scene='play';
  G.gold=G.D.gold+(G.chaos?220:0)+(G.coop?120:0);
- G.maxLives=G.coop?Math.round(G.D.lives*1.6):G.D.lives; G.lives=G.maxLives;
+ G.maxLives=G.coop?Math.round(G.D.lives*1.6):G.D.lives;
+ if(U.allin) G.maxLives=Math.max(1,Math.round(G.maxLives/2));
+ if(U.glass) G.maxLives=1;
+ G.lives=G.maxLives;
  G.score=0; G.wave=0; G.waveOn=false; G.waveT=0; G.repBank=0;
  G.queue=[]; G.enemies=[]; G.towers=[]; G.shots=[]; G.fx=[]; G.parts=[]; G.texts=[];
  G.pools=[]; G.mines=[]; G.bombs=[]; G.crawlers=[]; G.vortex=[]; G.shBank=0; G.rushT=0; G.pAcc=0; G.cShield=0; G.bossOn=false; G.corpseDepth=0;
@@ -5259,14 +5888,19 @@ function finish(win){
 
 /* ═══════════ 루프 ═══════════ */
 const FIX=1/60;
-let lastT=0, acc=0, fpsA=0, fpsN=0;
+let lastT=0, acc=0, fpsA=0, fpsN=0, fpsGood=0;
 function loop(ts){
  requestAnimationFrame(loop);
  if(!lastT){ lastT=ts; return; }
  let dt=(ts-lastT)/1000; lastT=ts;
  if(dt>.25) dt=.25;
  fpsA+=dt; fpsN++;
- if(fpsA>=1.5){ G.lowfx=(fpsN/fpsA)<44; fpsA=0; fpsN=0; }
+ if(fpsA>=1.5){
+  const fps=fpsN/fpsA;
+  if(fps<44){ G.lowfx=true; fpsGood=0; }
+  else if(G.lowfx&&fps>55&&++fpsGood>=6) G.lowfx=false;
+  fpsA=0; fpsN=0;
+ }
  const frozen=(G.scene==='play'&&G.paused);
  acc+=dt;
  let guard=0;
@@ -5291,6 +5925,7 @@ function boot(){
  E.roGold=$('#ro-gold'); E.roLife=$('#ro-life'); E.mapname=$('#mapname'); E.diffbadge=$('#diffbadge');
  E.mflist=$('#mflist'); E.mftimer=$('#mftimer'); E.mfbonus=$('#mfbonus');
  E.call=$('#b-call'); E.auto=$('#b-auto'); E.pause=$('#b-pause');
+ E.flash=$('#augflash'); E.title=$('#title');
  E.tabs=$('#tabs'); E.augpanel=$('#augpanel'); E.auglist=$('#auglist');
 
  G.diff=DB.opt('diff','normal'); G.D=DIFFS[G.diff]||DIFFS.normal;
@@ -5380,6 +6015,12 @@ function boot(){
  });
  window.addEventListener('blur',function(){ if(G.scene==='play'&&!G.paused) togglePause(); });
 
+ const tgo=$('#t-go');
+ if(tgo) tgo.addEventListener('click',function(){
+  SND.init(); SND.resume(); SND.play('build');
+  E.title.classList.add('gone');
+  setTimeout(function(){ E.title.style.display='none'; },460);
+ });
  NET.init();
  NET.onLobby=function(){
   if(G.scene==='play'||!G.coopSel) return;
