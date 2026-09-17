@@ -1911,6 +1911,10 @@ const SND={
   this.musOn=v;
   if(this.ready&&this.musicSrc) this.gMus.gain.setTargetAtTime(v?.32:0,this.ctx.currentTime,.35);
  },
+ /* 화면이 가려지거나(다른 앱으로 전환) 게임을 일시정지하면 오디오 클록 자체를 멈춰
+    확실히 소리가 끊기게 한다 — 배경음악 볼륨만 줄이면 브라우저에 따라 계속 들릴 수 있다. */
+ pauseAll(){ if(this.ctx&&this.ctx.state==='running') this.ctx.suspend().catch(()=>{}); },
+ resumeAll(){ if(this.ctx&&this.ctx.state==='suspended') this.ctx.resume().catch(()=>{}); },
  pump(){
   if(!this.ready||!this.musicFilter) return;
   /* 강도는 천천히 따라간다 — 갑자기 음색이 튀지 않게 */
@@ -5109,6 +5113,7 @@ function togglePause(){
  G.paused=!G.paused;
  E.pause.classList.toggle('on',G.paused);
  E.pause.innerHTML=G.paused?'▶ 재개':'❚❚ 정지';
+ if(G.paused) SND.pauseAll(); else SND.resumeAll();
 }
 
 /* ═══════════ 지형 미리보기 ═══════════ */
@@ -5608,7 +5613,7 @@ function coopLobbyHtml(){
 }
 /* ═══════════ 메뉴 ═══════════ */
 function openMenu(){
- if(G.scene==='play'){ G.paused=true; E.pause.classList.add('on'); E.pause.innerHTML='▶ 재개'; }
+ if(G.scene==='play'){ G.paused=true; E.pause.classList.add('on'); E.pause.innerHTML='▶ 재개'; SND.pauseAll(); }
  showMenu(G.scene==='play');
 }
 function showMenu(resumable){
@@ -5984,6 +5989,10 @@ function boot(){
   else if(c==='BracketRight'){ setSpeed(Math.min(3,G.speed+1)); }
  });
  window.addEventListener('blur',function(){ if(G.scene==='play'&&!G.paused) togglePause(); });
+ document.addEventListener('visibilitychange',function(){
+  if(document.hidden){ if(G.scene==='play'&&!G.paused) togglePause(); else SND.pauseAll(); }
+  else SND.resumeAll();
+ });
 
  const tgo=$('#t-go');
  if(tgo) tgo.addEventListener('click',function(){
